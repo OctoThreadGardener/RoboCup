@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE symbol-and-basic-behavior-files SYSTEM "../symbol-and-basic-behavior-files.dtd">
+<option xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="opt_kick_ball" initial-state="stand_before_kick">
+  &xabsl_symbol;
+  &basic_behavior;
+  &options;
+  <state name="stand_before_kick">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.Close"/>
+    </set-enumerated-output-symbol>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <time-of-state-execution/>
+            <decimal-value value="1500"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="stand_before_kick"/>
+      </if>
+      <else>
+        <transition-to-state ref="kick_ball"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="kick_ball">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.FarMid"/>
+    </set-enumerated-output-symbol>
+    <subsequent-basic-behavior ref="behavior_kick_ball"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <time-of-state-execution/>
+            <decimal-value value="6000"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="kick_ball"/>
+      </if>
+      <else>
+        <transition-to-state ref="end_kick_ball"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="end_kick_ball">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <time-of-state-execution/>
+            <decimal-value value="1000"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="end_kick_ball"/>
+      </if>
+      <else>
+        <transition-to-state ref="kick_done"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="kick_done" is-target-state="true">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <transition-to-state ref="kick_done"/>
+    </decision-tree>
+  </state>
+</option>

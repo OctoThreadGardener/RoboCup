@@ -1,0 +1,613 @@
+option opt_game_nearballadjust
+{
+    initial state initialize_motors//0
+  {
+    decision
+    {      
+                        //if (state_time<60000)
+                     if (state_time< 10000)
+                     {
+                              stay;
+                     }
+                     else
+                     {
+                              goto initializing;
+                     }
+    }
+    action
+    {
+                     behavior_initialize_motors(); // sends commands type 10 to robot to initialize motors
+    }
+  }
+
+	state initializing//1
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (state_time < 2000)
+				{
+					stay;
+				}
+                                else
+                                {
+                                        //goto first_kick_ball;
+                                        goto wait_for_start;
+                                }
+			}
+		}
+		action
+		{
+                        headMode = CloseMid;
+                        kick_speed = 0;
+			behavior_initialize();	// basic behavior initialize
+			
+		}
+	}
+
+	state wait_for_start//2
+	{
+		decision
+		{			
+			if (!isGameStart || isGameOver)
+			{
+				stay;
+			}
+			else
+			{
+				goto walk_with_ball;
+			}
+		}
+		action
+		{
+			//opt_search_for_ball_goal();
+                        headMode = CloseMid;
+                        behavior_nothing();
+		}
+	}
+
+
+
+	state walk_with_ball//3
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (!action_done)
+				{
+					stay;
+				}
+                                else
+                                {
+                                        //goto first_kick_ball;
+                                        goto search_ball;
+                                }
+			}
+		}
+		action
+		{
+                        headMode = CloseMid;
+                        kick_speed = 0;
+			opt_walk_with_ball();	// basic behavior initialize
+			
+		}
+	}
+
+	/*state before_first_kick_ball//5
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+                                if (state_time > 5000 && ballRange>0.1)
+				{
+					goto step_forward_1;
+				}
+				else if (state_time > 5000 && ballBearing>5)
+				{
+					goto step_right_1;
+				}
+                                else if (state_time > 5000 && ballBearing<-5)
+                                {
+                                        goto step_left_1;
+                                }
+                                else if (state_time > 5000)
+                                {
+                                        goto first_kick_ball;
+                                }
+                                else
+                                {
+                                        stay;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        headMode = CloseMid;
+			behavior_nothing();
+		}
+	}
+
+
+	state step_forward_1//11
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time > 2000 && !is_robot_moving)
+				{
+					stay;
+				}
+                                else
+                                {
+                                          goto first_kick_ball;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        target_range = 0.15;
+			behavior_step_forward();
+		}
+	}
+
+	state step_right_1//12
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time > 2000 && !is_robot_moving)
+				{
+					stay;
+				}
+                                else
+                                {
+                                          goto first_kick_ball;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        target_range = 0.08;
+			behavior_step_right();
+		}
+	}
+
+	state step_left_1//13
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time > 2000 && !is_robot_moving)
+				{
+					stay;
+				}
+                                else
+                                {
+                                          goto first_kick_ball;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        target_range = 0.08;
+			behavior_step_left();
+		}
+	}
+
+
+	state first_kick_ball//5
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (!action_done)
+				{
+					stay;
+				}
+                                else if (cannot_kick)
+                                {
+                                        goto before_first_kick_ball;
+                                }
+				else
+				{
+					goto wait_for_search_ball;
+				}
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+			opt_kick_ball();
+		}
+	}
+
+	state wait_for_search_ball//6
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time < 6000)
+				{
+					stay;
+				}
+				else
+				{
+					goto search_ball;
+				}
+			}
+		}
+		action
+		{
+                        headMode = FarMid;
+			behavior_nothing();
+		}
+	}
+
+*/
+        state search_ball//4
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else 
+			{
+				if(!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto near_ball_adjust;//BothTrack?
+				}
+			}
+		}
+		action
+		{
+			opt_search_for_ball_kick_off();
+		}
+	}
+
+        state near_ball_adjust//5
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else 
+			{
+				if(!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto search_ball_before_kick_ball;
+				}
+			}
+		}
+		action
+		{
+                        lastBallDir = CloseMid;
+                        kick_speed = 2;
+			opt_near_ball_adjust_test_2();
+		}
+	}
+
+	state search_ball_before_kick_ball//6
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				//if (action_done)
+                                if (isBallSeen)
+				{
+					goto kick_ball;
+				}
+                               /* else if (state_time > 10000)
+                                {
+                                        goto search_ball_again;
+                                }*/
+                                else
+                                {
+                                        stay;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+			//opt_search_for_ball_before_kick();
+                        headMode = CloseMid;
+                        behavior_nothing();
+		}
+	}
+
+	state search_ball_again//7
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (action_done)
+				{
+					goto near_ball_adjust;
+				}
+                                else 
+                                {
+                                        stay;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+			opt_search_for_ball_kick_off();
+		}
+	}
+
+	state before_kick_ball//8
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+                                if (state_time > 6000 && ballRange>0.1)
+				{
+					goto step_forward;
+				}
+				else if (state_time > 6000 && ballBearing>5)
+				{
+					goto step_right;
+				}
+                                else if (state_time > 6000 && ballBearing<-5)
+                                {
+                                        goto step_left;
+                                }
+                                else if (state_time > 6000)
+                                {
+                                        goto kick_ball;
+                                }
+                                else
+                                {
+                                        stay;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        headMode = CloseMid;
+			behavior_nothing();
+		}
+	}
+
+	state step_forward//9
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time < 2000 && is_robot_moving)
+				{
+					stay;
+				}
+                                else
+                                {
+                                          goto kick_ball;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        target_range = 0.15;
+			behavior_step_forward();
+		}
+	}
+
+	state step_right//10
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time < 2000 && is_robot_moving)
+				{
+					stay;
+				}
+                                else
+                                {
+                                          goto kick_ball;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        target_range = 0.08;
+			behavior_step_right();
+		}
+	}
+
+	state step_left//11
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time < 2000 && is_robot_moving)
+				{
+					stay;
+				}
+                                else
+                                {
+                                          goto kick_ball;
+                                }
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+                        target_range = 0.08;
+			behavior_step_left();
+		}
+	}
+
+	state kick_ball//12
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (!action_done)
+				{
+					stay;
+				}
+                                else if (cannot_kick)
+                                {
+                                        goto before_kick_ball;
+                                }
+				else
+				{
+					goto after_kick;
+				}
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+			opt_kick_ball();
+		}
+	}
+
+	state after_kick//13
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			//else if (isBallSeen)
+                        else
+			{
+				if (state_time < 3000)
+				{
+					stay;
+				}
+				else
+				{
+					goto search_ball;
+				}
+			}
+                       // else goto search_ball_before_kick;
+		}
+		action
+		{
+			behavior_nothing();
+		}
+	}
+
+        target state game_over//14
+	{
+		decision
+		{
+			stay;
+		}
+		action
+		{
+			behavior_nothing();
+		}
+	}
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!ENTITY xabsl_symbol SYSTEM "Symbols/xabsl_symbol.xml">
+<!ENTITY basic_behavior SYSTEM "BasicBehaviors/basic_behavior.xml">
+<!ENTITY options SYSTEM "options.xml">

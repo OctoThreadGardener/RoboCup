@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE symbol-and-basic-behavior-files SYSTEM "../symbol-and-basic-behavior-files.dtd">
+<option xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="opt_vision_ball" initial-state="start_to_find_ball">
+  &xabsl_symbol;
+  &basic_behavior;
+  &options;
+  <state name="start_to_find_ball">
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isBallSeen"/>
+        </condition>
+        <transition-to-state ref="ball_seen"/>
+      </if>
+      <else>
+        <transition-to-state ref="turn_right_for_ball"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="turn_left_for_ball">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.FarLeft"/>
+    </set-enumerated-output-symbol>
+    <subsequent-basic-behavior ref="behavior_initialize"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isBallSeen"/>
+        </condition>
+        <transition-to-state ref="ball_seen_left"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <less-than>
+              <time-of-state-execution/>
+              <decimal-value value="6000"/>
+            </less-than>
+          </condition>
+          <transition-to-state ref="turn_left_for_ball"/>
+        </if>
+        <else>
+          <transition-to-state ref="failed_to_find"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="turn_right_for_ball">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.FarRight"/>
+    </set-enumerated-output-symbol>
+    <subsequent-basic-behavior ref="behavior_initialize"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isBallSeen"/>
+        </condition>
+        <transition-to-state ref="ball_seen_right"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <less-than>
+              <time-of-state-execution/>
+              <decimal-value value="6000"/>
+            </less-than>
+          </condition>
+          <transition-to-state ref="turn_right_for_ball"/>
+        </if>
+        <else>
+          <transition-to-state ref="failed_to_find"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="failed_to_find">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.MidMid"/>
+    </set-enumerated-output-symbol>
+    <decision-tree>
+      <transition-to-state ref="start_to_find_again"/>
+    </decision-tree>
+  </state>
+  <state name="start_to_find_again">
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isBallSeen"/>
+        </condition>
+        <transition-to-state ref="ball_seen"/>
+      </if>
+      <else>
+        <transition-to-state ref="turn_right_again"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="turn_left_again">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.MidLeft"/>
+    </set-enumerated-output-symbol>
+    <subsequent-basic-behavior ref="behavior_initialize"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isBallSeen"/>
+        </condition>
+        <transition-to-state ref="ball_seen_left"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <less-than>
+              <time-of-state-execution/>
+              <decimal-value value="6000"/>
+            </less-than>
+          </condition>
+          <transition-to-state ref="turn_left_again"/>
+        </if>
+        <else>
+          <transition-to-state ref="start_to_find_ball"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="turn_right_again">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.MidRight"/>
+    </set-enumerated-output-symbol>
+    <subsequent-basic-behavior ref="behavior_initialize"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isBallSeen"/>
+        </condition>
+        <transition-to-state ref="ball_seen_right"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <less-than>
+              <time-of-state-execution/>
+              <decimal-value value="6000"/>
+            </less-than>
+          </condition>
+          <transition-to-state ref="turn_right_again"/>
+        </if>
+        <else>
+          <transition-to-state ref="start_to_find_ball"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="ball_seen_left">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.BothTrack"/>
+    </set-enumerated-output-symbol>
+    <set-decimal-output-symbol ref="angleSave">
+      <decimal-input-symbol-ref ref="robotLoc.theta"/>
+    </set-decimal-output-symbol>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <time-of-state-execution/>
+            <decimal-value value="3000"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="ball_seen_left"/>
+      </if>
+      <else>
+        <transition-to-state ref="rotate_left"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="ball_seen_right">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.BothTrack"/>
+    </set-enumerated-output-symbol>
+    <set-decimal-output-symbol ref="angleSave">
+      <decimal-input-symbol-ref ref="robotLoc.theta"/>
+    </set-decimal-output-symbol>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <time-of-state-execution/>
+            <decimal-value value="3000"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="ball_seen_right"/>
+      </if>
+      <else>
+        <transition-to-state ref="rotate_right"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="rotate_left">
+    <subsequent-basic-behavior ref="behavior_round_anticlockwise"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <plus>
+              <decimal-output-symbol-ref ref="angleSave"/>
+              <decimal-input-symbol-ref ref="headAngleYaw"/>
+            </plus>
+            <decimal-input-symbol-ref ref="robotLoc.theta"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="rotate_left"/>
+      </if>
+      <else>
+        <transition-to-state ref="ball_seen"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="rotate_right">
+    <subsequent-basic-behavior ref="behavior_round_clockwise"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <minus>
+              <decimal-output-symbol-ref ref="angleSave"/>
+              <decimal-input-symbol-ref ref="headAngleYaw"/>
+            </minus>
+            <decimal-input-symbol-ref ref="robotLoc.theta"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="rotate_right"/>
+      </if>
+      <else>
+        <transition-to-state ref="ball_seen"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="ball_seen" is-target-state="true">
+    <set-enumerated-output-symbol ref="headMode">
+      <enum-element-ref ref="_headMode.FarMid"/>
+    </set-enumerated-output-symbol>
+    <subsequent-basic-behavior ref="behavior_initialize"/>
+    <decision-tree>
+      <transition-to-state ref="ball_seen"/>
+    </decision-tree>
+  </state>
+</option>

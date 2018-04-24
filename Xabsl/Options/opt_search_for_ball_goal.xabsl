@@ -1,0 +1,52 @@
+option opt_search_for_ball_goal
+{
+        initial state search_ball
+        {
+                decision
+                {
+                    if(!action_done)
+                    {
+                            stay;
+                    }
+                    else 
+                    {
+                            goto search_goal;
+                    }
+                }
+                action
+                {
+                    opt_search_for_ball();
+                }
+         }
+            
+         state search_goal
+         {
+                 decision
+                 {  
+                     if(!action_done)
+                     {
+                             stay;
+                     }
+                     else
+                     {
+                             goto search_done;
+                     }
+                 }
+                 action
+                 {
+                     opt_search_for_goal();
+                 }
+          }
+
+          target state search_done
+          {
+                 decision
+                 {
+                             stay;
+                 }
+                 action
+                 {
+                      behavior_nothing();
+                 }
+           }
+}

@@ -1,0 +1,118 @@
+option opt_game_penalty
+{
+
+    initial state step_forward//0
+  {
+    decision
+    {      
+                     if (!is_robot_moving && state_time >2000)
+                     {
+                              goto before_kick;
+                     }
+                     else
+                     {
+                              stay;
+                     }
+    }
+    action
+    {
+                     target_range = 0.3;
+                     behavior_step_forward(); 
+    }
+  }
+
+    state before_kick//0
+  {
+    decision
+    {      
+                     if (isOpponentSeen && opponentCenterBearing<5 && opponentCenterBearing >0)
+                     {
+                             goto kick_left;
+                     }
+                     else if (isOpponentSeen && opponentCenterBearing>-5 && opponentCenterBearing >0)
+                     {
+                             goto kick_right;
+                     }
+                     else
+                     {
+                             goto kick_ball;
+                     }
+    }
+    action
+    {
+                     kick_speed = 2;
+                     behavior_nothing();
+    }
+  }
+
+    state kick_left//0
+  {
+    decision
+    {      
+                     if (!is_robot_moving && state_time >2000)
+                     {
+                             goto kick_ball;
+                     }
+                     else
+                     {
+                             stay;
+                     }
+    }
+    action
+    {
+                     target_theta = 10;
+                     behavior_center_round_anticlockwise();
+    }
+  }
+
+    state kick_right//0
+  {
+    decision
+    {      
+                     if (!is_robot_moving && state_time >2000)
+                     {
+                             goto kick_ball;
+                     }
+                     else
+                     {
+                             stay;
+                     }
+    }
+    action
+    {
+                     target_theta = 10;
+                     behavior_center_round_clockwise();
+    }
+  }
+
+    state kick_right//0
+  {
+    decision
+    {      
+                     if (!is_robot_moving && state_time >2000)
+                     {
+                             goto kick_done;
+                     }
+                     else
+                     {
+                             stay;
+                     }
+    }
+    action
+    {
+                     opt_kick_ball();
+    }
+  }
+
+    target state kick_done//0
+  {
+    decision
+    {      
+                     stay;
+    }
+    action
+    {
+                     behavior_nothing();
+    }
+  }
+}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE symbol-and-basic-behavior-files SYSTEM "../symbol-and-basic-behavior-files.dtd">
+<option xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="opt_vision_goal" initial-state="get_angle">
+  &xabsl_symbol;
+  &basic_behavior;
+  &options;
+  <state name="get_angle">
+    <subsequent-basic-behavior ref="behavior_get_angle"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <less-than>
+            <time-of-state-execution/>
+            <decimal-value value="1000"/>
+          </less-than>
+        </condition>
+        <transition-to-state ref="get_angle"/>
+      </if>
+      <else>
+        <transition-to-state ref="check_adjust_angle"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="check_adjust_angle">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <and>
+            <less-than-or-equal-to>
+              <decimal-input-symbol-ref ref="kickDestTheta"/>
+              <decimal-value value="0.1"/>
+            </less-than-or-equal-to>
+            <greater-than-or-equal-to>
+              <decimal-input-symbol-ref ref="kickDestTheta"/>
+              <decimal-value value="-0.1"/>
+            </greater-than-or-equal-to>
+          </and>
+        </condition>
+        <transition-to-state ref="adjust_done"/>
+      </if>
+      <else>
+        <transition-to-state ref="adjust_not_done"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="adjust_not_done">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <transition-to-state ref="adjust_not_done"/>
+    </decision-tree>
+  </state>
+  <state name="adjust_done" is-target-state="true">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <transition-to-state ref="adjust_done"/>
+    </decision-tree>
+  </state>
+</option>

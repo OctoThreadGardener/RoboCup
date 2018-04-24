@@ -1,0 +1,6 @@
+uint8 bBallWasSeen
+uint16 iCenterInImageX
+uint16 iCenterInImageY
+uint16 iRadiusInImage
+float32 fDistance
+float32 fAngle

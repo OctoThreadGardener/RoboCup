@@ -1,0 +1,366 @@
+/** the adjustment near the ball */
+option opt_near_ball_adjust          //kickDestTheta = relative angle
+{
+	initial state start_near_ball_adjust
+	{
+		decision
+		{
+			if (first_kick)
+			{
+				goto first_kick_prepare;
+			}
+			else if (!isGoalSeen)
+			{
+				goto search_goal;
+			}
+                        else
+                        {
+                                goto kick_to_goal_prepare;
+                        }
+		}
+		action
+		{
+			headMode=CloseMid;//bothtrack?
+		}
+	}
+
+/*	state first_kick_prepare
+        {
+                decision
+                {      
+                        if (ballRange > 0.1)
+                        {
+                               stay;
+                        }
+
+                        else 
+                        {
+                               goto adjust_done;
+                        }
+                }
+                action
+                {   
+                        kick_speed=0;
+                        lastBallDir = CloseMid;
+                        behavior_step_forward();
+                }
+         }
+*/
+	state first_kick_prepare
+        {
+                decision
+                {      
+                        if (!isBallSeen)
+                        {
+                               goto search_ball;
+                        }
+			else 
+			{
+		            	if (ballRange > 0.1)
+				{
+					stay;
+				}
+				else
+				{
+					goto adjust_done;
+				}
+			}
+                }
+                action
+                {   
+                        kick_speed=0;
+                        lastBallDir = CloseMid;
+                        behavior_step_forward();
+                }
+         }
+	state search_ball
+	{
+		decision
+		{
+                        if (!action_done)
+                        {
+                                stay;
+                        }
+
+			else
+			{
+				goto first_kick_prepare;
+			}
+		}
+		action
+		{
+                        opt_search_for_ball();
+		}
+	}
+
+	state search_goal
+	{
+		decision
+		{
+                        if (action_done)
+                        {
+                                goto kick_to_goal_prepare;
+                        }
+		        else if ((!action_done) && (state_time < 36000))//not sure
+			{
+				stay;
+			}
+			else
+			{
+				goto kick_to_center_prepare_1;
+			}
+		}
+		action
+		{
+			headMode=FarMid;
+                        opt_search_for_goal();
+		}
+	}
+
+        state kick_to_center_prepare_1
+        {
+                decision
+                {
+                      if (ballRange > 0.05)
+                      {          
+                                stay;
+                      }
+                      else
+                      {
+                                goto kick_to_center_prepare_2;
+                      }
+                }
+                action 
+                {     
+                      headMode=CloseMid;
+                      target_range=ballRange-0.05;
+                      target_bearing=ballBearing;
+                      kick_speed=1;
+                      behavior_walk();
+                }
+        }
+
+        state kick_to_center_prepare_2
+        {
+                decision
+                {
+                      if (locConfidence < 0.65)
+                      {          
+                                goto lift_head;
+                      }
+                      else if ((robotLoc.x/robotLoc.y)!=(ballLoc.World.x/ballLoc.World.y)||(robotLoc.x < ballLoc.World.x))
+                      {
+                                stay;
+                      }
+                      else
+                      {
+                                goto adjust_done;//what if the opponent is seen?
+                      }
+                }
+                action 
+                {     
+                      behavior_center_round_clockwise();
+                }
+        }
+
+        state lift_head
+        {
+               decision
+               {      
+                      if (locConfidence > 0.65)
+                      {
+                               goto kick_to_center_prepare_2;
+                      }
+                      else if(state_time < 6000 && locConfidence < 65)
+                      { 
+                                stay;
+                      }
+                      else 
+                      {
+                               goto kick_to_nowhere;
+                      }
+              }
+                action
+                {
+                      headMode=FarMid;
+                }
+        }
+
+        state kick_to_nowhere
+        {
+               decision
+               {
+                     if (locConfidence < 0.65)
+                     {
+                               stay;
+                     }
+                     else
+                     {     
+                              goto kick_to_center_prepare_2;//what if the ball is too far?
+                     }
+               }
+               action
+               {
+                      behavior_step_forward();
+               }
+        }
+
+
+        state kick_to_goal_prepare
+        {
+                decision
+                {
+                      if (ballRange > 0.05)
+                      {          
+                                stay;
+                      }
+                      else
+                      {
+                                goto kick_to_goal_prepare_1;
+                      }
+                }
+                action 
+                {     
+                      headMode=CloseMid;
+                      /*target_x=(ballRange-0.05)*cos(ballBearing);
+                      target_y=(ballRange-0.05)*sin(ballBearing);*/
+                      target_range=ballRange-0.05;
+                      target_bearing=ballBearing;
+                      kick_speed=2;
+                      behavior_walk();
+                }
+        }
+
+        state kick_to_goal_prepare_1
+        {
+                decision
+                { 
+                     if ((locConfidence > 0.80) && (((((((goalLocLeft.World.x+goalLocRight.World.x)/2)-ballLoc.World.x)/(((goalLocLeft.World.y+goalLocRight.World.y)/2)-ballLoc.World.y)) - ((((goalLocLeft.World.x+goalLocRight.World.x)/2)-robotLoc.x)/(((goalLocLeft.World.y+goalLocRight.World.y)/2)-robotLoc.y)) ) > 0.1) || ((( (((goalLocLeft.World.x+goalLocRight.World.x)/2)-ballLoc.World.x)/(((goalLocLeft.World.y+goalLocRight.World.y)/2)-ballLoc.World.y)) - ((((goalLocLeft.World.x+goalLocRight.World.x)/2)-robotLoc.x)/(((goalLocLeft.World.y+goalLocRight.World.y)/2)-robotLoc.y))) < -0.1)) &&  (robotLoc.x < ballLoc.World.x))
+                               {
+                                       stay; 
+                               }
+                         
+                       //clockwise until the robot,the ball,the goal center are in a line
+                     else if (locConfidence < 0.80)
+                     {
+                               goto kick_to_goal_prepare_2;
+                     }
+                     else
+                     {
+                               goto check_opponent;
+                     }
+                }
+                action
+                {
+                     headMode=CloseMid;
+                     behavior_center_round_clockwise();
+                }
+        }
+
+        state kick_to_goal_prepare_2
+        {
+                decision
+                { 
+                     if ((ballBearing - robot_goal_bearing > 0.1) || (ballBearing - robot_goal_bearing < -0.1) )
+                     {         
+                               stay;
+                     }
+                     else
+                     {
+                               goto check_opponent;
+                     }
+                }
+                action
+                {
+                     behavior_center_round_clockwise();
+                }
+        }
+
+        state check_opponent
+       {
+                decision
+                {
+                     if (!isOpponentSeen)
+                     {
+                               goto adjust_done;
+                     }
+                     else
+                     {
+                               goto avoid_opponent;
+                     }
+                }
+                action
+                {
+                       headMode=FarMid;
+                }
+        }
+
+        state avoid_opponent
+        {
+                decision
+                { 
+                     if (robot_goal_bearing > opponentCenterBearing)
+                     {         
+                               goto do_clockwise;
+                     }
+                     else
+                     {
+                               goto do_anticlockwise;
+                     }
+                }
+                action
+                {
+                     behavior_center_round_clockwise();
+                }
+        }
+
+        state do_clockwise
+        {
+                decision
+                { 
+                     if (!action_done) //not sure if it can be used with a behavior
+                     {         
+                               goto adjust_done;
+                     }
+                     else
+                     {
+                               stay;
+                     }
+                }
+                action
+                {
+                     behavior_round_clockwise();
+                }
+        }
+
+        state do_anticlockwise
+        {
+                decision
+                { 
+                     if (!action_done)
+                     {         
+                               goto adjust_done;
+                     }
+                     else
+                     {
+                               stay;
+                     }
+                }
+                action
+                {
+                     behavior_round_anticlockwise();
+                }
+        }
+
+	target state adjust_done
+	{
+		decision
+		{
+			stay;
+		}
+		action
+		{
+			behavior_nothing();
+		}
+	}
+}

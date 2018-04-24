@@ -1,0 +1,149 @@
+option opt_search_for_goal_test
+{     
+       initial state look_up_mid//8
+	{
+		decision
+		{
+/*                        if (!isBallSeen)*/
+/*                        {*/
+/*                                goto search_ball;*/
+/*                        }*/
+/*                        else*/ if (isGoalSeen)
+                        {
+                                goto goal_seen;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_right;
+		        }
+                }
+		action
+		{
+			headMode = FarMid;
+                        nextGoalDir=FarRight;
+                        behavior_initialize();
+		}
+	}
+
+       state look_up_right//9
+	{
+		decision
+		{
+/*                        if (!isBallSeen)*/
+/*                        {*/
+/*                                goto search_ball;*/
+/*                        }*/
+/*                        else */ if (isGoalSeen)
+                        {
+                                goto goal_seen;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_left;
+		        }
+                }
+		action
+		{
+			headMode = FarRight;
+                        nextGoalDir=FarLeft;
+                        behavior_initialize();
+		}
+	}
+      state look_up_left//10
+	{
+		decision
+		{
+/*                        if (!isBallSeen)*/
+/*                        {*/
+/*                                goto search_ball;*/
+/*                        }*/
+/*                        else */ if (isGoalSeen)
+                        {
+                                goto goal_seen;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_mid;
+		        }
+                }
+		action
+		{
+			headMode = FarLeft;
+                        nextGoalDir=FarMid;
+                        behavior_initialize();
+		}
+	}
+
+       state search_ball//7
+	{
+		decision
+		{
+			if (!isBallSeen)
+			{
+				stay;
+			}
+                        else if (nextGoalDir==FarRight)
+                        {
+                                goto look_up_right;
+		        }
+                        else if (nextGoalDir==FarLeft)
+                        {
+                                goto look_up_left;
+		        }
+                        else 
+                        {
+                                goto look_up_mid;
+		        }
+                }
+		action
+		{
+			opt_search_for_ball_kick_off();
+		}
+        }
+
+        state goal_seen//11
+       {
+                decision
+                {
+                       if ( state_time < 2000 )
+                       { 
+                                stay;
+                        }
+                       else
+                        {
+                                 goto goal_seen_over;
+                        }
+                }
+                action
+                {
+                       robot_goal_bearing = goalCenterBearing - headAngleYaw;
+                       robot_turn_theta = adjust_theta;
+                       behavior_nothing();
+                }
+	}
+
+        target state goal_seen_over//12
+       {
+                decision
+                {
+                      stay;
+                }
+                action
+                {
+                       behavior_nothing();
+                }
+	}
+}
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<basic-behaviors xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="basic_behavior" title="Basic Behavior" description="Basic behavior definitions">
+  <basic-behavior name="behavior_nothing" description=""/>
+  <basic-behavior name="behavior_end_game" description=""/>
+  <basic-behavior name="behavior_initialize" description=""/>
+  <basic-behavior name="behavior_turn_left" description=""/>
+  <basic-behavior name="behavior_turn_right" description=""/>
+  <basic-behavior name="behavior_center_round_clockwise" description=""/>
+  <basic-behavior name="behavior_center_round_anticlockwise" description=""/>
+  <basic-behavior name="behavior_round_clockwise" description=""/>
+  <basic-behavior name="behavior_round_anticlockwise" description=""/>
+  <basic-behavior name="behavior_step" description="">
+    <enumerated-parameter name="behavior_step.orientation" enumeration="_orientation" description=""/>
+  </basic-behavior>
+  <basic-behavior name="behavior_walk" description=""/>
+  <basic-behavior name="behavior_get_angle" description=""/>
+  <basic-behavior name="behavior_kick_ball" description=""/>
+</basic-behaviors>

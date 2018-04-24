@@ -1,0 +1,398 @@
+/**	Top-level FSM	*/
+option opt_game
+{
+
+	initial state wait_for_start //0
+	{
+		decision
+		{			
+			if (!isGameStart || isGameOver)
+			{
+				stay;
+			}
+			else
+			{
+				goto initializing;
+			}
+		}
+		action
+		{
+			opt_search_for_ball_goal();
+		}
+	}
+
+	state initializing //1
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (state_time < 3000)
+				{
+					stay;
+				}
+				else
+				{
+					goto search_ball;
+				}
+			}
+		}
+		action
+		{
+                        ball_first_seen = true;
+			behavior_initialize();	// basic behavior initialize
+			
+		}
+	}
+
+	/*state first_glance_goal		
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (!action_done)//"action_done": This expression becomes true, when
+						 //the current state has an subsequent option, and
+    						 //the active state of the subsequent option is marked as a target state.
+						 //Otherwise this statement is false
+				{
+					if (state_time < 30000)	// 30秒内，等机器人找球和球门
+					{
+						stay;
+					}
+					else	// 30秒内都没有发现球和球门，转向后方，走一段距离，再找
+					{
+						goto step_back_glancing;
+					}
+					stay;
+				}
+				else	// 按照定位的需求，找到了球和球门，调用路径规划，向球走
+				{
+					goto first_search_ball_180;
+				}
+			}
+		}
+		action
+		{
+			opt_vision_goal();		// sub option search_for_goal
+		}
+	} */
+
+/*	state step_back_glancing
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto first_glance;
+				}
+			}
+		}	
+		action
+		{
+			opt_first_change_location();		// sub option first_change_location()
+		}
+	}*/
+
+// is this necessary? nope, the ball isn't behind us in the beginning of the game any more
+	/*state first_search_ball_180
+	{
+		decision
+		{
+			if(isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if(robotLoc.theta > -160 && robotLoc.theta < 160)  //set the destination . 
+				{
+					stay;
+				}
+				else
+				{
+					goto first_search_ball;
+				}	
+			}
+		}
+		action
+		{
+			behavior_round_clockwise();
+		} 
+	}*/
+
+	/*state first_search_ball
+	{
+		decision
+		{
+			if(isGameOver)
+			{
+				goto game_over;
+			}
+			else 
+			{
+				if(!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto make_sure;
+				}
+			}
+		}
+		action
+		{
+			opt_vision_ball();
+		}
+	}
+
+	state make_sure
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else if(!isBallSeen)
+			{
+				goto first_search_ball;
+			}
+			else
+			{
+				goto walk_to_ball_far;
+			}
+		}
+		action
+		{
+			
+		}
+	}*/
+
+        state search_ball //2
+	{
+		decision
+		{
+			if(isGameOver)
+			{
+				goto game_over;
+			}
+			else 
+			{
+				if(!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto walk_to_ball;
+				}
+			}
+		}
+		action
+		{
+			opt_search_for_ball();
+		}
+	}
+
+	state walk_to_ball //3
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else if(!isBallSeen)
+			{
+				goto search_ball;
+			}
+			else 
+			{
+				if (ballRange > 0.5)		
+				{
+					stay;
+				}
+				else 
+				{
+					goto near_ball_adjust;	
+				}
+				
+			}
+		}
+		action
+		{
+		  	target_range=ballRange-0.5;
+                        target_bearing=headAngleYaw;	
+                        behavior_walk();	
+		}
+	}
+
+	state near_ball_adjust //4
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else  
+			{
+		            	if (!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto kick_ball;
+				}
+			}
+                       
+		}
+		action
+		{
+			opt_near_ball_adjust();
+		}
+	}
+
+/*	state near_ball_adjust
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else if (isBallSeen)
+			{
+		            	if (!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto kick_ball;
+				}
+			}
+                        else 
+                        {
+                                goto search_ball;
+                        }
+		}
+		action
+		{
+			opt_near_ball_adjust();
+		}
+	}*/
+
+/*	state before_kick			//	踢球前做的事情，再次确认门和球的位置
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto kick_ball;
+				}
+			}
+		}
+		action
+		{
+			opt_beforFe_kick();
+		}
+	}
+*/
+	state kick_ball
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else if (isBallSeen)
+			{
+				if (!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto after_kick;
+				}
+			}
+                        else goto search_ball;
+		}
+		action
+		{
+			opt_kick_ball();
+		}
+	}
+
+	state after_kick	
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (state_time < 3000)
+				{
+					stay;
+				}
+				else
+				{
+					goto search_ball;
+				}
+			}
+                        
+		}
+		action
+		{
+			opt_search_for_ball_goal();
+		}
+	}
+
+	target state game_over
+	{
+		decision
+		{
+			stay;//goto wait_for_start;
+		}
+		action
+		{
+			behavior_end_game();
+		}
+	}
+}

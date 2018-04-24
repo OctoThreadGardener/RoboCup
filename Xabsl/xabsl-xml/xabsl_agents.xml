@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE options [
+    <!ENTITY options SYSTEM "options.xml">
+]>
+<agent-collection xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <title/>
+  <platform/>
+  <software-environment/>
+  <agent id="Decision2016" title="Xabsl" description="" root-option="opt_game"/>
+  &options;
+  <options>
+    <xi:include href="Options/opt_game.xml"/>
+    <xi:include href="Options/opt_kick_ball.xml"/>
+    <xi:include href="Options/opt_near_ball_adjust.xml"/>
+    <xi:include href="Options/opt_vision_ball.xml"/>
+    <xi:include href="Options/opt_vision_goal.xml"/>
+    <xi:include href="Options/opt_walk_along_path.xml"/>
+  </options>
+</agent-collection>

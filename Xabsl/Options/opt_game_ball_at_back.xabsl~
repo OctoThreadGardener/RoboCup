@@ -1,0 +1,115 @@
+option opt_game_test_goal_search
+{
+    initial state initialize_motors//0
+  {
+    decision
+    {      
+                        //if (state_time<60000)
+                     if (state_time< 10000)
+                     {
+                              stay;
+                     }
+                     else
+                     {
+                              goto wait_for_ready;
+                     }
+    }
+    action
+    {
+                     behavior_initialize_motors(); // sends commands type 10 to robot to initialize motors
+    }
+  }
+
+    state wait_for_ready//1
+  {
+    decision
+    {      
+
+                     if (!isReady)
+                     {
+                              stay;
+                     }
+                     else
+                     {
+                              goto wait_for_start;
+                     }
+    }
+    action
+    {
+                     behavior_nothing(); 
+    }
+  }
+  
+	state wait_for_start//2
+	{
+		decision
+		{			
+			if (!isGameStart || isGameOver)
+			{
+				stay;
+			}
+			else
+			{
+				goto initializing;
+			}
+		}
+		action
+		{
+			opt_search_for_ball_goal();
+		}
+	}
+
+	state initializing//3
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else
+			{
+				if (state_time < 2000)
+				{
+					stay;
+				}
+                                else
+                                {
+                                        goto search_ball;
+                                }
+			}
+		}
+		action
+		{
+			behavior_initialize();	// basic behavior initialize
+			
+		}
+	}
+
+
+        state search_ball//4
+	{
+		decision
+		{
+			if (isGameOver)
+			{
+				goto game_over;
+			}
+			else 
+			{
+				if(!action_done)
+				{
+					stay;
+				}
+				else
+				{
+					goto near_ball_adjust;//BothTrack?
+				}
+			}
+		}
+		action
+		{
+			opt_search_for_ball_at_back();
+		}
+	}
+

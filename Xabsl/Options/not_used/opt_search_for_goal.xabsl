@@ -1,0 +1,191 @@
+option opt_search_for_goal
+{     
+	initial state start_goal_search//0
+	{
+		decision
+		{
+                        if (odom_orientation < 90 && odom_orientation > -90)
+                        {       
+                                goto look_up_mid;
+                        }
+                        else
+                        {
+                                goto turn_body_180;
+                        }
+                }
+		action
+		{
+			turned = 0;
+		}
+	}
+	
+        state turn_body_180//1
+	{
+		decision
+		{
+    			 if (state_time > 2000 && !is_robot_moving)
+   			 {
+   			         goto look_up_mid;
+ 			 }
+ 		         else
+   			 {
+   				 stay;
+  			 }
+                }
+		action
+		{
+                        target_theta = 180;
+			behavior_round_clockwise();
+		}
+        }
+
+       state search_ball//2
+	{
+		decision
+		{
+			if (!isBallSeen)
+			{
+				stay;
+			}
+                        else if (nextGoalDir==FarRight)
+                        {
+                                goto look_up_right;
+		        }
+                        else if (nextGoalDir==FarLeft)
+                        {
+                                goto look_up_left;
+		        }
+                        else 
+                        {
+                                goto look_up_mid;
+		        }
+                }
+		action
+		{
+			opt_search_for_ball();
+		}
+        }
+
+       state look_up_mid//3
+	{
+		decision
+		{
+                        if (!isBallSeen)
+                        {
+                                goto search_ball;
+                        }
+                        else if ((option_time/36000-turned) > 0)
+                        {       
+                                goto turn_body_180;
+                        }
+                        else if (isGoalSeen)
+                        {
+                                goto goal_seen;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_right;
+		        }
+                }
+		action
+		{
+			headMode = FarMid;
+                        nextGoalDir=FarRight;
+                        behavior_initialize();
+		}
+	}
+
+       state look_up_right//4
+	{
+		decision
+		{
+                        if (!isBallSeen)
+                        {
+                                goto search_ball;
+                        }
+                        else if (isGoalSeen)
+                        {
+                                goto goal_seen;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_left;
+		        }
+                }
+		action
+		{
+			headMode = FarRight;
+                        nextGoalDir=FarLeft;
+                        behavior_initialize();
+		}
+	}
+      state look_up_left//5
+	{
+		decision
+		{
+                        if (!isBallSeen)
+                        {
+                                goto search_ball;
+                        }
+                        else if (isGoalSeen)
+                        {
+                                goto goal_seen;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_mid;
+		        }
+                }
+		action
+		{
+			headMode = FarLeft;
+                        nextGoalDir=FarMid;
+                        behavior_initialize();
+		}
+	}
+
+        state goal_seen//6
+       {
+                decision
+                {
+                       if ( state_time < 500 )	
+                       { 
+                                stay;
+                        }
+                       else
+                        {
+                                 goto goal_seen_over;
+                        }
+                }
+                action
+                {
+                       behavior_nothing();
+                       robot_goal_bearing = goalCenterBearing - headAngleYaw;
+                }
+	}
+
+        target state goal_seen_over//7
+       {
+                decision
+                {
+                      stay;
+                }
+                action
+                {
+                       behavior_nothing();
+                }
+	}
+}
+

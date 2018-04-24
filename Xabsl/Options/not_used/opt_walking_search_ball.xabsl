@@ -1,0 +1,225 @@
+option opt_walking_search_ball
+{     
+	initial state start_ball_search//0
+	{
+		decision
+		{
+			if (lastBallDir == FarMid)
+			{
+				goto look_up_mid;
+			}
+			else if (lastBallDir == FarRight)
+			{
+				goto look_up_right;
+			}
+			else if (lastBallDir == FarLeft)
+			{
+				goto look_up_left;
+			} 
+			else if (lastBallDir == CloseRight)
+			{
+				goto look_down_right;
+			}
+			else if (lastBallDir == CloseLeft)
+			{
+				goto look_down_left;
+			}
+			else 
+			{
+				goto look_down_mid;
+			}
+
+                }
+		action
+		{
+			turned = 0;
+		}
+	}
+	
+        state look_up_mid//1
+	{
+		decision
+		{
+                        if ((option_time/72000-turned) > 0)
+                        {       
+                                goto turn_body_180;
+                        }
+			else if (state_time < 6000)
+			{
+				stay;
+			}
+                        else if (isBallSeen)
+                        {
+                                goto ball_seen;
+                        }
+                        else 
+                        {
+                                goto look_down_mid;
+		        }
+                }
+		action
+		{
+			headMode = FarMid;
+                        lastBallDir = FarMid;
+                        behavior_initialize();
+		}
+	}
+
+        state look_down_mid//2
+	{
+		decision
+		{
+			if (state_time < 6000)
+			{
+				stay;
+			}
+                        else if (isBallSeen)
+                        {
+                                goto ball_seen;
+                        }
+                        else 
+                        {
+                                goto look_up_right;
+		        }
+                }
+		action
+		{
+			headMode = CloseMid;
+                        lastBallDir = CloseMid;
+                        behavior_initialize();
+		}
+	}
+
+        state look_up_right//3
+	{
+		decision
+		{
+			if (state_time < 6000)
+			{
+				stay;
+			}
+                        else if (isBallSeen)
+                        {
+                                goto ball_seen;
+                        }
+                        else 
+                        {
+                                goto look_up_left;
+		        }
+                }
+		action
+		{
+			headMode = FarRight;
+                        lastBallDir = FarRight;
+                        behavior_initialize();
+		}
+	}
+
+        state look_up_left//4
+	{
+		decision
+		{
+			if (state_time < 6000)
+			{
+				stay;
+			}
+                        else if (isBallSeen)
+                        {
+                                goto ball_seen;
+                        }
+                        else 
+                        {
+                                goto look_down_left;
+		        }
+                }
+		action
+		{
+			headMode = FarLeft;
+                        lastBallDir = FarLeft;
+                        behavior_initialize();
+		}
+	}
+
+        state look_down_left//5
+	{
+		decision
+		{
+			if (state_time < 6000)
+			{
+				stay;
+			}
+                        else if (isBallSeen)
+                        {
+                                goto ball_seen;
+                        }
+                        else 
+                        {
+                                goto look_down_right;
+		        }
+                }
+		action
+		{
+			headMode = CloseLeft;
+                        lastBallDir = CloseLeft;
+                        behavior_initialize();
+		}
+	}
+
+        state look_down_right//6
+	{
+		decision
+		{
+			if (state_time < 6000)
+			{
+				stay;
+			}
+                        else if (isBallSeen)
+                        {
+                                goto ball_seen;
+                        }
+                        else 
+                        {
+                                goto look_up_mid;
+		        }
+                }
+		action
+		{
+			headMode = CloseRight;
+                        lastBallDir = CloseRight;
+                        behavior_initialize();
+		}
+	}
+
+        state turn_body_180//7
+	{
+		decision
+		{
+			if (state_time < 6000)
+			{
+				stay;
+			}
+                        else 
+                        {
+                                goto look_up_mid;
+		        }
+                }
+		action
+		{
+			behavior_round_clockwise();
+                        turned=turned+1;
+		}
+        }
+
+        target state ball_seen//8
+       {
+                decision
+                {
+                       stay;            
+                }
+                action
+                {
+                       headMode = BothTrack;
+                       behavior_nothing();
+                }
+	}
+}

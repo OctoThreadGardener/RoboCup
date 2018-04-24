@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<symbols xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="xabsl_symbol" title="xabsl_symbols" description="Symbol definitions">
+  <enumeration name="_orientation" description="----- Data structure definition -----">
+    <enum-element name="_orientation.Up"/>
+    <enum-element name="_orientation.Down"/>
+    <enum-element name="_orientation.Left"/>
+    <enum-element name="_orientation.Right"/>
+    <enum-element name="_orientation.Mid"/>
+    <enum-element name="_orientation.UnKnown"/>
+  </enumeration>
+  <enumeration name="_action" description="">
+    <enum-element name="_action.zero"/>
+    <enum-element name="_action.stand"/>
+    <enum-element name="_action.step"/>
+    <enum-element name="_action.passive"/>
+    <enum-element name="_action.active"/>
+    <enum-element name="_action.kick"/>
+  </enumeration>
+  <enumeration name="_speed" description="">
+    <enum-element name="_speed.speed0"/>
+    <enum-element name="_speed.speed1"/>
+    <enum-element name="_speed.speed2"/>
+    <enum-element name="_speed.speed3"/>
+  </enumeration>
+  <enumeration name="_LR" description="">
+    <enum-element name="_LR.LLLL"/>
+    <enum-element name="_LR.LLL"/>
+    <enum-element name="_LR.LL"/>
+    <enum-element name="_LR.L"/>
+    <enum-element name="_LR.M"/>
+    <enum-element name="_LR.R"/>
+    <enum-element name="_LR.RR"/>
+    <enum-element name="_LR.RRR"/>
+    <enum-element name="_LR.RRRR"/>
+  </enumeration>
+  <enumeration name="_headMode" description="">
+    <enum-element name="_headMode.FarLeft"/>
+    <enum-element name="_headMode.FarMid"/>
+    <enum-element name="_headMode.FarRight"/>
+    <enum-element name="_headMode.MidLeft"/>
+    <enum-element name="_headMode.MidMid"/>
+    <enum-element name="_headMode.MidRight"/>
+    <enum-element name="_headMode.Close"/>
+    <enum-element name="_headMode.HorizontalTrack"/>
+    <enum-element name="_headMode.VerticalTrack"/>
+    <enum-element name="_headMode.BothTrack"/>
+  </enumeration>
+  <boolean-input-symbol name="isGameStart" description="----- Input -----"/>
+  <boolean-input-symbol name="isGameOver" description=""/>
+  <decimal-input-symbol name="timeLeft" description="" measure="sec" range=""/>
+  <boolean-input-symbol name="bBallLocRequired" description=""/>
+  <boolean-input-symbol name="bGoalLocRequired" description=""/>
+  <boolean-input-symbol name="isBallSeen" description=""/>
+  <decimal-input-symbol name="ballLoc.Image.x" description="" measure="px" range=""/>
+  <decimal-input-symbol name="ballLoc.Image.y" description="" measure="px" range=""/>
+  <decimal-input-symbol name="ballDistance" description="" measure="" range=""/>
+  <boolean-input-symbol name="isGoalSeen" description=""/>
+  <decimal-input-symbol name="robotLoc.theta" description="" measure="rad" range=""/>
+  <boolean-input-symbol name="isPathPlanningRequested" description=""/>
+  <decimal-input-symbol name="kickDestTheta" description="" measure="rad" range=""/>
+  <decimal-input-symbol name="headAngleYaw" description="" measure="" range=""/>
+  <decimal-input-symbol name="headAnglePitch" description="" measure="" range=""/>
+  <decimal-output-symbol name="angleSave" description="----- Output -----" measure="" range=""/>
+  <enumerated-output-symbol name="headMode" enumeration="_headMode" description=""/>
+</symbols>

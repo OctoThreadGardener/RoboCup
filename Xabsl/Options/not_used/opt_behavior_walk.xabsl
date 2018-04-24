@@ -1,0 +1,36 @@
+option opt_behavior_walk
+{
+	initial state walk
+	{
+		decision
+		{
+                        if (!is_robot_moving && state_time > 2000)
+                        {
+                                goto walk_done;
+                        }
+			else
+			{
+				stay;
+			}
+		}
+		action
+		{
+                        behavior_walk();
+		}
+	}
+
+	target state walk_done
+	{
+		decision
+		{
+				stay;
+			
+		}
+		action
+		{
+                        behavior_nothing();
+		}
+	}
+}
+
+

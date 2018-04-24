@@ -1,0 +1,7 @@
+int32 type
+float64 speed_x
+float64 speed_y
+float64 rotation_speed
+int32 step
+---
+int32 results

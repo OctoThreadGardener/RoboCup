@@ -1,0 +1,12 @@
+<launch>
+  <!-- First, launch "udp_receiver". Node listens to the UDP communication between the 2 NUCs.
+  Output is published over the topic "decision/udp_receiver"-->
+  <node name="udp_receiver" pkg="decision" type="udp_receiver" output="screen">
+  </node>
+
+  <!-- Then, launch "decision_node". Node implements the Xabsl-based behavior and sends commands
+  to the Motion NUC over the UDP communication channel. Output on screen.-->
+  <node name="decision_node" pkg="decision" type="decision_node" output="screen">
+  </node>
+
+</launch>

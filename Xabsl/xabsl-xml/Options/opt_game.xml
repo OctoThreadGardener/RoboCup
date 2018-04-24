@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE symbol-and-basic-behavior-files SYSTEM "../symbol-and-basic-behavior-files.dtd">
+<option xmlns="http://www.xabsl.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="opt_game" initial-state="wait_for_start">
+  &xabsl_symbol;
+  &basic_behavior;
+  &options;
+  <state name="wait_for_start">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <or>
+            <not>
+              <boolean-input-symbol-ref ref="isGameStart"/>
+            </not>
+            <boolean-input-symbol-ref ref="isGameOver"/>
+          </or>
+        </condition>
+        <transition-to-state ref="wait_for_start"/>
+      </if>
+      <else>
+        <transition-to-state ref="initializing"/>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="initializing">
+    <subsequent-basic-behavior ref="behavior_initialize"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <less-than>
+              <time-of-state-execution/>
+              <decimal-value value="3000"/>
+            </less-than>
+          </condition>
+          <transition-to-state ref="initializing"/>
+        </if>
+        <else>
+          <transition-to-state ref="first_search_ball_180"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="first_glance_goal">
+    <subsequent-option ref="opt_vision_goal"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <not>
+              <subsequent-option-reached-target-state/>
+            </not>
+          </condition>
+          <transition-to-state ref="first_glance_goal"/>
+        </if>
+        <else>
+          <transition-to-state ref="first_search_ball_180"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="first_search_ball_180">
+    <subsequent-basic-behavior ref="behavior_round_clockwise"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <and>
+              <greater-than>
+                <decimal-input-symbol-ref ref="robotLoc.theta"/>
+                <decimal-value value="-160"/>
+              </greater-than>
+              <less-than>
+                <decimal-input-symbol-ref ref="robotLoc.theta"/>
+                <decimal-value value="160"/>
+              </less-than>
+            </and>
+          </condition>
+          <transition-to-state ref="first_search_ball_180"/>
+        </if>
+        <else>
+          <transition-to-state ref="first_search_ball"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="first_search_ball">
+    <subsequent-option ref="opt_vision_ball"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <not>
+              <subsequent-option-reached-target-state/>
+            </not>
+          </condition>
+          <transition-to-state ref="first_search_ball"/>
+        </if>
+        <else>
+          <transition-to-state ref="make_sure"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="make_sure">
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <not>
+              <boolean-input-symbol-ref ref="isBallSeen"/>
+            </not>
+          </condition>
+          <transition-to-state ref="first_search_ball"/>
+        </if>
+        <else>
+          <transition-to-state ref="walk_to_ball_far"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="walk_to_ball_far">
+    <subsequent-option ref="opt_walk_along_path"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <greater-than>
+              <decimal-input-symbol-ref ref="ballDistance"/>
+              <decimal-value value="2"/>
+            </greater-than>
+          </condition>
+          <transition-to-state ref="walk_to_ball_far"/>
+        </if>
+        <else>
+          <if>
+            <condition description="">
+              <greater-than>
+                <decimal-input-symbol-ref ref="ballDistance"/>
+                <decimal-value value="0"/>
+              </greater-than>
+            </condition>
+            <transition-to-state ref="kick_ball"/>
+          </if>
+          <else>
+            <transition-to-state ref="first_search_ball"/>
+          </else>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="near_ball_adjust">
+    <subsequent-option ref="opt_near_ball_adjust"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <not>
+              <subsequent-option-reached-target-state/>
+            </not>
+          </condition>
+          <transition-to-state ref="near_ball_adjust"/>
+        </if>
+        <else>
+          <transition-to-state ref="kick_ball"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="kick_ball">
+    <subsequent-option ref="opt_kick_ball"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <not>
+              <subsequent-option-reached-target-state/>
+            </not>
+          </condition>
+          <transition-to-state ref="kick_ball"/>
+        </if>
+        <else>
+          <transition-to-state ref="game_over"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="after_kick">
+    <subsequent-basic-behavior ref="behavior_nothing"/>
+    <decision-tree>
+      <if>
+        <condition description="">
+          <boolean-input-symbol-ref ref="isGameOver"/>
+        </condition>
+        <transition-to-state ref="game_over"/>
+      </if>
+      <else>
+        <if>
+          <condition description="">
+            <less-than>
+              <time-of-state-execution/>
+              <decimal-value value="3000"/>
+            </less-than>
+          </condition>
+          <transition-to-state ref="after_kick"/>
+        </if>
+        <else>
+          <transition-to-state ref="first_search_ball"/>
+        </else>
+      </else>
+    </decision-tree>
+  </state>
+  <state name="game_over">
+    <subsequent-basic-behavior ref="behavior_end_game"/>
+    <decision-tree>
+      <transition-to-state ref="game_over"/>
+    </decision-tree>
+  </state>
+</option>
