@@ -1,0 +1,104 @@
+option opt_go_to_ball
+{
+  initial state rotate_before_walk {
+    decision {
+      if (state_time < 100) {  // change this value
+        stay;
+      } else {
+	      if (is_within_tol) {
+	        goto during_walk;
+	      }
+	      else {
+	        if (is_left) {
+	          goto rotate_left_before_walk;
+	        } else {
+	          goto rotate_right_before_walk;
+	        }
+	      }
+      }
+    }
+    action {
+      check_before_walk();
+    }
+  }
+
+  state rotate_left_before_walk {
+    decision {
+      if (state_time < 1000) {  // change this value
+        stay;
+      } else {
+        if (is_within_tol) {
+          goto during_walk;
+        }
+        else {
+          if (is_left) {
+            stay;
+          } else {
+            goto rotate_right_before_walk;
+          }
+        }
+      }
+    }
+    action {
+      rotate_left_before_walk();
+    }
+  }
+
+  state rotate_right_before_walk {
+    decision {
+      if (state_time < 1000) {  // change this value
+        stay;
+      } else {
+        if (is_within_tol) {
+          goto during_walk;
+        }
+        else {
+          if (!is_left) {
+            stay;
+          } else {
+            goto rotate_left_before_walk;
+          }
+        }
+      }
+    }
+    action {
+      rotate_right_before_walk();
+    }
+  }
+
+  state during_walk {
+    decision {
+      if (false) {
+        goto rotate_after_walk;
+      }
+      else {
+        stay;
+      }
+    }
+    action {
+      behavior_during_walk();
+    }
+  }
+
+  state rotate_after_walk {
+    decision {
+      if (false) {
+        goto go_to_ball_done;
+      } else {
+        stay;
+      }
+    }
+    action {
+      behavior_rotate_after_walk();
+    }
+  }
+
+  target state go_to_ball_done {
+    decision {
+      stay;
+    }
+    action {
+      behavior_nothing();
+    }
+  }
+}
