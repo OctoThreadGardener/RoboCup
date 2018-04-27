@@ -12,3 +12,5 @@ include "Options/opt_search_for_ball_kick_off.xabsl";
 include "Options/opt_near_ball_adjust_test_2.xabsl";
 include "Options/opt_search_for_goal_test.xabsl";
 agent Decision("Xabsl", opt_game_nearballadjust);
+
+include "Options/opt_go_to_ball.xabsl";
