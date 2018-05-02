@@ -10,7 +10,7 @@ include "Options/opt_kick_ball.xabsl";
 include "Options/opt_walk_with_ball.xabsl";
 include "Options/opt_search_for_ball_kick_off.xabsl";
 include "Options/opt_near_ball_adjust_test_2.xabsl";
-include "Options/opt_search_for_goal_test.xabsl";
+//include "Options/opt_search_for_goal_test.xabsl";
 
 // Additions 2018
 include "Options/opt_attack_procedure.xabsl";

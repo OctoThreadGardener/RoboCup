@@ -83,4 +83,24 @@ namespace basic_behavior("Basic Behavior")
 	{
 	
 	}
+
+    behavior behavior_rotate_before_walk
+  {
+  
+  }
+
+    behavior behavior_during_left_walk
+  {
+  
+  }
+  
+    behavior behavior_during_right_walk
+  {
+  
+  }
+
+   behavior behavior_rotate_after_walk
+  {
+  
+  }
 }

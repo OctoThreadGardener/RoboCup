@@ -4,13 +4,21 @@ project(decision)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+FIND_PACKAGE(Qt4 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   std_msgs
   message_generation
+  tf
+  cv_bridge
+  image_transport
 )
 
+find_package(OpenCV REQUIRED)
+
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## System dependencies are found with CMake's conventions
  find_package(Boost REQUIRED COMPONENTS system)
 
@@ -55,6 +63,7 @@ find_package(catkin REQUIRED COMPONENTS
     Obstacle.msg
     OutputData.msg
     UDPReceived.msg
+    SerialReceived.msg
   )
 
 ## Generate services in the 'srv' folder
@@ -93,7 +102,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
    INCLUDE_DIRS include
 #  LIBRARIES decision
-   CATKIN_DEPENDS geometry_msgs roscpp std_msgs message_runtime message_generation
+   CATKIN_DEPENDS cv_bridge image_transport geometry_msgs roscpp std_msgs message_runtime message_generation tf
    DEPENDS system_lib
 )
 
@@ -104,8 +113,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
+include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+
 include_directories(
   ${catkin_INCLUDE_DIRS}
+/usr/include/qt4
+/usr/include/qt4/QtCore
+/usr/include/qt4/QtExtSerialPort
 )
 
 ## Declare a cpp library
@@ -129,25 +143,25 @@ src/xabsl-debug-interface.cpp)
 
 ## Declare a cpp executable
  add_executable(decision_node src/main_node.cpp)
- add_executable(udp_receiver src/udp_receiver.cpp)
-# add_executable(decision_node src/Definition.cpp)
-# add_executable(decision_node src/basic_behavior.cpp)
-# add_executable(decision_node src/xabsl-debug-interface.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
  add_dependencies(decision_node decision_generate_messages_cpp roscpp)
- add_dependencies(udp_receiver decision_generate_messages_cpp roscpp)
 
 ## Specify libraries to link a library or executable target agains 
  target_link_libraries(decision_node
    decision_lib
    ${catkin_LIBRARIES}
+${OpenCV_LIBRARIES}
  )
- target_link_libraries(udp_receiver
+
+add_executable(serial_receiver src/serial_receiver.cpp)
+ add_dependencies(serial_receiver decision_generate_messages_cpp roscpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(serial_receiver
    decision_lib
-   ${catkin_LIBRARIES}
+   ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${QT_LIBRARIES} -lqextserialport
  )
+link_directories(/usr/include/qt4/QtExtSerialPort)
 
 
 

@@ -71,7 +71,8 @@ option opt_attack_procedure
             }
         }
         action {
-            opt_kick_ball();
+            //opt_kick_ball();
+            behavior_kick_ball_strong();
         }
     }
 
