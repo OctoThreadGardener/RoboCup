@@ -1,142 +1,114 @@
-// Flags: is_within_tol, is_left
-// 		  is_near_enough
-//        is_ready_to_kick
+// opt_go_to_ball: Suppose the ball is already seen, go to the ball.
+
+// Flags: 
+//      - is_within_tol
+//      - is_left
+//      - is_near_enough
+//      - is_ready_to_kick
+
 option opt_go_to_ball
 {
-  initial state check_before_walk {
-    decision {
-      if (state_time < 100) {  // change this value
-        stay;
-      } 
-		  else {
-		    if (is_within_tol) {
-					if(is_left){
-						goto during_left_walk;
-					}
-					else{
-						goto during_right_walk;
-					}
-		    }
-	      else {
-	        if (is_left) {
-	          goto rotate_left_before_walk;
-	        } 
-				  else {
-		          goto rotate_right_before_walk;
-		      }
-		    }
-	    }
-    }
-    action {
-      behavior_check_before_walk();
-    }
-  }
-
-  state rotate_left_before_walk {
-    decision {   
-	    if (is_within_tol) {
-				if(is_left){
-					goto during_left_walk;
-				}
-				else{
-					goto during_right_walk;
-				}
-			}
-        else {
-          if (is_left) {
-            stay;
-          } 
-		  else {
-            goto rotate_right_before_walk;
-          }
+    initial state check_before_walk {
+        decision {
+            if (state_time < 100) {  // TODO: change this value
+                stay;
+            }
+            else {
+                if (is_within_tol) {
+                    if(is_left) {
+                        goto during_left_walk;
+                    }
+                    else {
+                        goto during_right_walk;
+                    }
+                }
+                else {
+                    goto rotate_before_walk;
+                }
+            }
         }
-      }
-    action {
-      rotate_left_before_walk();
+        action {
+            behavior_nothing();     // wait until the flags are ready
+        }
     }
-  }
 
-  state rotate_right_before_walk {
-    decision {
-	  if (is_within_tol) {
-		  if(is_left){
-			  goto during_left_walk;
-		  }
-		  else{
-			  goto during_right_walk;
-		  }
-	  }
-	  else {
-	    if (!is_left) {
-		  stay;
-	    } else {
-		  goto rotate_left_before_walk;
-	    }
-	  }
+    state rotate_before_walk {
+        decision {
+            if (is_within_tol) {
+                if(is_left) {
+                    goto during_left_walk;
+                }
+                else{
+                    goto during_right_walk;
+                }
+            }
+            else {
+                stay;
+            }
+        }
+        action {
+            behavior_rotate_before_walk();
+        }
     }
-    action {
-      rotate_right_before_walk();
-    }
-  }
 
-  state during_left_walk {  
-    decision {
-      if (is_near_enough) {
-        goto rotate_after_walk;
-      }
-      else {
-		    if (is_left){
-				  stay;
-			  }
-		    else{
-			    goto during_right_walk;
-		    }
-      }
+    state during_left_walk {
+        decision {
+            if (is_near_enough) {
+                goto rotate_after_walk;
+            }
+            else {
+                if (is_left) {
+                    stay;
+                }
+                else {
+                    goto during_right_walk;
+                }
+            }
+        }
+        action {
+            behavior_during_left_walk();
+        }
     }
-    action {
-      behavior_during_left_walk();
-    }
-  }
 
-  state during_right_walk {  
-    decision {
-      if (is_near_enough) {
-        goto rotate_after_walk;
-      }
-      else {
-		    if (!is_left){
-			    stay;
-		    }
-		    else{
-			    goto during_left_walk;
-		    }
-      }
+    state during_right_walk {
+        decision {
+            if (is_near_enough) {
+                goto rotate_after_walk;
+            }
+            else {
+                if (!is_left) {
+                    stay;
+                }
+                else {
+                    goto during_left_walk;
+                }
+            }
+        }
+        action {
+            behavior_during_right_walk();
+        }
     }
-    action {
-      behavior_during_right_walk();
-    }
-  }
-  
-  state rotate_after_walk {
-    decision {
-      if (is_ready_to_kick) {
-        goto go_to_ball_done;
-      } 
-	  else {
-        stay;
-      }
-    }
-    action {
-      behavior_rotate_after_walk();
-    }
-  }
 
-  target state go_to_ball_done {
-    decision {
-      stay;
+    state rotate_after_walk {
+        decision {
+            if (is_ready_to_kick) {
+                goto go_to_ball_done;
+            }
+            else {
+                stay;
+            }
+        }
+        action {
+            behavior_rotate_after_walk();
+        }
     }
-    action {
-      behavior_nothing();
+
+    target state go_to_ball_done {
+        decision {
+            stay;
+        }
+        action {
+            behavior_nothing();
+        }
     }
-  }
 }

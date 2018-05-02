@@ -182,4 +182,11 @@ bool input cannot_kick;
                 float internal goal_found_goal_bearing;
                 float internal goal_found_goal_range;
 
+
+    // Additions 2018
+    bool input is_within_tol;
+    bool input is_left;
+    bool input is_near_enough;
+    bool input is_ready_to_kick;
+
 }

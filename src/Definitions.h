@@ -193,6 +193,16 @@ public:
 
         void FlushData(double _body_gyro,double _odom_orientation, double _odom_x, double _odom_y);
         void PrintReceivedData(void);
+
+
+    /*
+     * Additions 2018 for opt_go_to_ball
+     */
+
+    bool is_within_tol;         // true if the angle between the body and the direction toward the ball is small enough
+    bool is_left;               // true if the body is to the left of the direction toward the ball
+    bool is_near_enough;        // true if near enough to ball, and object tracking mode can be enabled
+    bool is_ready_to_kick;      // true when near enough to kick
 };
 
 void CBOnGoalReceived(const stereo_process::Goalpost::ConstPtr &msg );

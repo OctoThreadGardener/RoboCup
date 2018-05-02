@@ -1,0 +1,88 @@
+// opt_attack_procedure: Initialize, search for ball, go to ball, and kick.
+
+option opt_attack_procedure
+{
+    initial state initialize_motors {
+        decision {
+            if (state_time < 1000) {
+                stay;
+            }
+            else {
+                // TODO: add more conditions about the controller
+                goto initialize_robot;
+            }
+        }
+        action {
+            behavior_initialize_motors();
+        }
+    }
+
+    state initialize_robot {
+        decision {
+            if (state_time < 2000) {
+                stay;
+            } else {
+                goto search_for_ball;
+            }
+        }
+        action {
+            headMode = CloseMid;
+            kick_speed = 0;
+            behavior_initialize();
+        }
+    }
+
+    state search_for_ball {
+        decision {
+            if (!action_done) {
+                stay;
+            }
+            else {
+                goto go_to_ball;
+            }
+        }
+        action {
+            // brute-force search
+            opt_search_for_ball_kick_off();     // TODO: switch to heuristic search
+        }
+    }
+
+    state go_to_ball {
+        decision {
+            if (!action_done) {
+                stay;
+            }
+            else {
+                goto kick_ball;
+            }
+        }
+        action {
+            opt_go_to_ball();
+        }
+    }
+
+    state kick_ball {
+        decision {
+            if (!action_done) {
+                stay;
+            }
+            else {
+                goto attack_procedure_done;
+            }
+        }
+        action {
+            opt_kick_ball();
+        }
+    }
+
+    target state attack_procedure_done {
+        decision {
+            stay;
+        }
+        action {
+            behavior_nothing(); 
+        }
+    }
+
+}
+

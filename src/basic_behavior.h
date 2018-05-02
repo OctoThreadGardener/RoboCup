@@ -436,3 +436,83 @@ public:
 
     virtual void execute();
 };
+
+/*
+ * Additions 2018 for opt_go_to_ball
+ */
+
+class behavior_rotate_before_walk: public BasicBehavior
+{
+public:
+
+    behavior_kick_ball_strong(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_rotate_before_walk", errorHandler)
+    {	}
+
+    virtual void registerParameters()
+    {
+    }
+
+    // rotate toward the line between the robot and the ball
+    // head follows the ball
+    // set flag: is_within_tol, is_left
+    virtual void execute();
+};
+
+class behavior_during_left_walk: public BasicBehavior
+{
+public:
+
+    behavior_during_left_walk(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_during_left_walk", errorHandler)
+    {	}
+
+    virtual void registerParameters()
+    {
+    }
+
+    // target position is set to within an acceptable range of the ball
+    // walk along an arc between the current position and midpoint(current position, target position)
+    // use velocity mode to control the gait
+    // head follows the ball
+    // set flag: is_left, is_near_enough
+    virtual void execute();
+};
+
+class behavior_during_right_walk: public BasicBehavior
+{
+public:
+
+    behavior_during_right_walk(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_during_right_walk", errorHandler)
+    {	}
+
+    virtual void registerParameters()
+    {
+    }
+
+    // walk along an arc between the current position the target position
+    // use velocity mode to control the gait
+    // head follows the ball
+    // set flag: is_left, is_near_enough
+    virtual void execute();
+};
+
+class behavior_rotate_after_walk: public BasicBehavior
+{
+public:
+
+    behavior_rotate_after_walk(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_rotate_after_walk", errorHandler)
+    {	}
+
+    virtual void registerParameters()
+    {
+    }
+
+    // walk toward the ball
+    // use velocity mode
+    // head follows the ball
+    // set flag: is_ready_to_kick
+    virtual void execute();
+};
