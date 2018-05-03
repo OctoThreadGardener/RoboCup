@@ -28,6 +28,7 @@ option opt_go_to_ball
             }
         }
         action {
+            headMode = BothTrack;
             behavior_nothing();     // wait until the flags are ready
         }
     }
@@ -47,6 +48,7 @@ option opt_go_to_ball
             }
         }
         action {
+            headMode = BothTrack;
             behavior_rotate_before_walk();
         }
     }
@@ -66,6 +68,7 @@ option opt_go_to_ball
             }
         }
         action {
+            headMode = BothTrack;
             behavior_during_left_walk();
         }
     }
@@ -85,6 +88,7 @@ option opt_go_to_ball
             }
         }
         action {
+            headMode = BothTrack;
             behavior_during_right_walk();
         }
     }
@@ -99,6 +103,7 @@ option opt_go_to_ball
             }
         }
         action {
+            headMode = BothTrack;
             behavior_rotate_after_walk();
         }
     }

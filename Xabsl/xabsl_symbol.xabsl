@@ -48,7 +48,9 @@ namespace xabsl_symbol("xabsl_symbols")
 
       HorizontalTrack,
       VerticalTrack,
-      BothTrack
+      BothTrack,
+
+      TrackBallAndGoal  // add this mode?
                 };
 
   /** ----- Input ----- */
