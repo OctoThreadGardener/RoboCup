@@ -498,12 +498,12 @@ public:
     virtual void execute();
 };
 
-class behavior_rotate_after_walk: public BasicBehavior
+class behavior_approach_ball: public BasicBehavior
 {
 public:
 
-    behavior_rotate_after_walk(xabsl::ErrorHandler &errorHandler)
-        : xabsl::BasicBehavior("behavior_rotate_after_walk", errorHandler)
+    behavior_approach_ball(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_approach_ball", errorHandler)
     {	}
 
     virtual void registerParameters()
@@ -514,5 +514,23 @@ public:
     // use velocity mode
     // head follows the ball
     // set flag: is_ready_to_kick
+    virtual void execute();
+};
+
+class behavior_stop_walk: public BasicBehavior
+{
+public:
+
+    behavior_approach_ball(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_stop_walk", errorHandler)
+    {	}
+
+    virtual void registerParameters()
+    {
+    }
+
+    // use velocity mode
+    // set velocity to 0
+    // set flag: is_robot_moving
     virtual void execute();
 };

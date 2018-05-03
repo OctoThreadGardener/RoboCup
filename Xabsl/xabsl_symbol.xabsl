@@ -189,6 +189,6 @@ bool input cannot_kick;
     bool input is_within_tol;
     bool input is_left;
     bool input is_near_enough;
-    bool input is_ready_to_kick;
+    bool input is_ready_to_kick;    // not used
 
 }

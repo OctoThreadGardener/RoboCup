@@ -1,10 +1,13 @@
 // opt_go_to_ball: Suppose the ball is already seen, go to the ball.
 
-// Flags: 
+// Input Flags: 
 //      - is_within_tol
 //      - is_left
 //      - is_near_enough
-//      - is_ready_to_kick
+//      - is_ready_to_kick      # not used
+//
+// Output Flags:
+//      - headMode
 
 option opt_go_to_ball
 {
@@ -15,7 +18,7 @@ option opt_go_to_ball
             }
             else {
                 if (is_within_tol) {
-                    if(is_left) {
+                    if (is_left) {
                         goto during_left_walk;
                     }
                     else {
@@ -36,10 +39,10 @@ option opt_go_to_ball
     state rotate_before_walk {
         decision {
             if (is_within_tol) {
-                if(is_left) {
-                    goto during_left_walk;
+                if (is_left) {
+                    godo during_left_walk;
                 }
-                else{
+                else {
                     goto during_right_walk;
                 }
             }
@@ -56,7 +59,7 @@ option opt_go_to_ball
     state during_left_walk {
         decision {
             if (is_near_enough) {
-                goto rotate_after_walk;
+                goto prepare_approach_ball;
             }
             else {
                 if (is_left) {
@@ -76,7 +79,7 @@ option opt_go_to_ball
     state during_right_walk {
         decision {
             if (is_near_enough) {
-                goto rotate_after_walk;
+                goto prepare_approach_ball;
             }
             else {
                 if (!is_left) {
@@ -93,9 +96,24 @@ option opt_go_to_ball
         }
     }
 
-    state rotate_after_walk {
+    state prepare_approach_ball {
         decision {
-            if (is_ready_to_kick) {
+            if (is_robot_moving) {
+                stay;
+            }
+            else {
+                goto approach_ball;
+            }
+        }
+        action {
+            headMode = BothTrack;
+            behavior_stop_walk();
+        }
+    }
+
+    state approach_ball {
+        decision {
+            if (state_time > 2000 || !is_robot_moving) {
                 goto go_to_ball_done;
             }
             else {
@@ -104,7 +122,7 @@ option opt_go_to_ball
         }
         action {
             headMode = BothTrack;
-            behavior_rotate_after_walk();
+            behavior_approach_ball();
         }
     }
 
