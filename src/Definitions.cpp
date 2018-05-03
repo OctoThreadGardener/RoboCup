@@ -161,10 +161,18 @@ void DataStructure::FlushData()
     cout << "ball_image_x:" << this->ball_image_x << "ball_image_y:" << this->ball_image_y << " ballBearing:" << this->ballBearing << endl << " ballRange:" << this->ballRange << endl;
     cout << "ballLoc_world_x:" << this->ballLoc_world_x << "ballLoc_world_y:" << this->ballLoc_world_y << endl;
 
-
-    is_within_tol = true;         // true if the angle between the body and the direction toward the ball is small enough
-    is_left = true;               // true if the body is to the left of the direction toward the ball
-    is_near_enough = true;        // true if near enough to ball, and object tracking mode can be enabled
+    if ((this->ballBearing < -0.1) && (this->isBallSeen))
+    this->is_within_tol = true;         // true if the angle between the body and the direction toward the ball is small enough
+    else
+        this->is_within_tol = false;
+    if ((this->ballBearing < 0) && (this->isBallSeen))
+    this->is_left = true;               // true if the body is to the left of the direction toward the ball
+    else
+       this->is_left = false;
+    if ((this->ballRange < 0.9) && (this->isBallSeen))
+    this->is_near_enough = true;        // true if near enough to ball, and object tracking mode can be enabled
+    else
+        this->is_near_enough = false;
     is_ready_to_kick = true;      // true when near enough to kick
 
 

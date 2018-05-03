@@ -48,25 +48,25 @@ void CBonSerialReceived(const decision::SerialReceived::ConstPtr serial_input_ms
     else if (currentFrame.decision_serial_input_data.received_data[10]==1)
         currentFrame.remote_switch_1 = true;
     else
-        ROS_INFO("Wrong robot moving code");
+        ROS_INFO("Wrong switch 1 code");
     if (currentFrame.decision_serial_input_data.received_data[11]==0)
         currentFrame.remote_switch_2 = false;
     else if (currentFrame.decision_serial_input_data.received_data[11]==1)
         currentFrame.remote_switch_2 = true;
     else
-        ROS_INFO("Wrong robot moving code");
+        ROS_INFO("Wrong switch 2 code");
     if (currentFrame.decision_serial_input_data.received_data[12]==0)
         currentFrame.remote_switch_3 = false;
     else if (currentFrame.decision_serial_input_data.received_data[12]==1)
         currentFrame.remote_switch_3 = true;
     else
-        ROS_INFO("Wrong robot moving code");
+        ROS_INFO("Wrong switch 3 code");
     if (currentFrame.decision_serial_input_data.received_data[13]==0)
         currentFrame.remote_switch_4 = false;
     else if (currentFrame.decision_serial_input_data.received_data[13]==1)
         currentFrame.remote_switch_4 = true;
     else
-        ROS_INFO("Wrong robot moving code");
+        ROS_INFO("Wrong switch 4 code");
 
 }
 
@@ -224,7 +224,7 @@ int main(int argc, char **argv)
     ros::Publisher publish_decision_console = nodeHandle.advertise<std_msgs::String>("decision_console", 10);
 
     /*******************publisher of head rotation*************/
-    ros::Publisher publish_head_rotation = nodeHandle.advertise<decision::SerialReceived>("decision/head_rotation", 10);
+    ros::Publisher publish_head_rotation = nodeHandle.advertise<head_motion::head_pose>("/head_command", 10);
 
 
     /*******************Serial publisher/subscriber*************/
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
     /*******************Xabsl*************************/
     Engine *pEngine = new Engine(errorHandler, &getSystemTime);
     //MyFileInputSource inputSource("/home/nvidia/robocup_ws/src/decision/intermediate_code/2017test1.dat");  //change that according to the required behavior
-    MyFileInputSource inputSource("/home/sotiris/robocup2018_ws/src/decision/intermediate_code/2018gotoball.dat");
+    MyFileInputSource inputSource("/home/nvidia/robocup2018_ws/src/decision/intermediate_code/2018gotoball.dat");
     xabslEngineRegister(pEngine, errorHandler);
     /*******************Xabsl_behavior****************/
 
@@ -249,6 +249,7 @@ int main(int argc, char **argv)
     behavior_round_clockwise _behavior_round_clockwise(errorHandler);
     behavior_round_anticlockwise _behavior_round_anticlockwise(errorHandler);
     behavior_walk _behavior_walk(errorHandler);
+    behavior_stop_walk _behavior_stop_walk(errorHandler);
     behavior_step_forward _behavior_step_forward(errorHandler);
     behavior_step_backward _behavior_step_backward(errorHandler);
     behavior_step_left _behavior_step_left(errorHandler);
@@ -273,6 +274,7 @@ int main(int argc, char **argv)
     pEngine->registerBasicBehavior(_behavior_round_clockwise);
     pEngine->registerBasicBehavior(_behavior_round_anticlockwise);
     pEngine->registerBasicBehavior(_behavior_walk);
+    pEngine->registerBasicBehavior(_behavior_stop_walk);
     pEngine->registerBasicBehavior(_behavior_step_forward);
     pEngine->registerBasicBehavior(_behavior_step_backward);
     pEngine->registerBasicBehavior(_behavior_step_left);
@@ -365,6 +367,30 @@ int main(int argc, char **argv)
         //        currentFrame.sec_state = 0;
         //        currentFrame.sec_state_info = 0;
 
+        if (roundCount < 80)
+        {
+            //Debug
+            currentFrame.isBallSeen = true;
+        currentFrame.ballBearing = -0.2;
+            currentFrame.ballRange = 4.0;
+            currentFrame.is_within_tol = false;
+            currentFrame.is_near_enough = false;
+            ROS_ERROR("Phase 1");
+        }
+        else if ((roundCount >=80) && (roundCount<180))
+        {
+            currentFrame.ballBearing = -0.2;
+            currentFrame.is_within_tol = true;
+            currentFrame.is_left = true;
+            currentFrame.is_near_enough = false;
+            ROS_ERROR("Phase 2");
+        }
+        else if (roundCount >=180)
+        {
+            currentFrame.is_near_enough = true;
+            ROS_ERROR("Phase 3");
+        }
+
         currentFrame.PrintReceivedData();
         //currentFrame includes the message subscribed from the service
 
@@ -390,12 +416,12 @@ int main(int argc, char **argv)
 
 
         // Publish the demanded head angle
-        decision::SerialReceived head_rotation_msg;
-        head_rotation_msg.received_data.at(0) = currentFrame.headAnglePitch / 180 *M_PI; //rad
-        head_rotation_msg.received_data.at(1) = currentFrame.headAngleYaw / 180 *M_PI; //rad
+        head_motion::head_pose head_pose_msg;
+        head_pose_msg.pitch = currentFrame.headAnglePitch; //degrees
+        head_pose_msg.yaw = currentFrame.headAngleYaw; //degrees
 
-        publish_head_rotation.publish(head_rotation_msg);
-        ROS_INFO("Sent head rotation %f,%f",head_rotation_msg.received_data.at(0),head_rotation_msg.received_data.at(1));
+        publish_head_rotation.publish(head_pose_msg);
+        ROS_INFO("Sent head rotation pitch: %f,yaw: %f",head_pose_msg.pitch ,head_pose_msg.yaw);
 
         ////////////debug
         console_msg.data = console_strstream.str();
@@ -423,6 +449,23 @@ int main(int argc, char **argv)
                 }
 
             }
+
+            //Debug
+//            serial_output_msg.received_data[0] = 1;
+//            serial_output_msg.received_data[1] = 0.2; //-0.15 - 0.3
+//            serial_output_msg.received_data[2] = 0.0; //-0.06 - 0.06
+//            serial_output_msg.received_data[3] = 0.2; //-0.6 - 0.6
+
+//            serial_output_msg.received_data[0] = 3;
+//            serial_output_msg.received_data[1] = 0.9; //-0.15 - 0.3
+//            serial_output_msg.received_data[2] = 0.2; //-0.06 - 0.06
+//            serial_output_msg.received_data[3] = 0.0; //-0.6 - 0.6
+
+//            serial_output_msg.received_data[0] = 6;
+//            serial_output_msg.received_data[1] = 0.65; //-0.15 - 0.3
+//            serial_output_msg.received_data[2] = 0.25; //-0.06 - 0.06
+//            serial_output_msg.received_data[3] = 0.0; //-0.6 - 0.6
+
 
             command_to_serial_pub.publish(serial_output_msg);
             currentFrame.update_command = false;
@@ -560,59 +603,45 @@ bool processHeadMode()
 {
 
 
-//        if ((currentFrame.headMode != HorizontalTrack) &&
-//                (currentFrame.headMode != VerticalTrack) &&
-//                (currentFrame.headMode != BothTrack))
-//        {
-//            switch (currentFrame.headMode)
-//            {
-//            case FarLeft:
-//                //broadcast.OutputPacket[4] = 30;
-//                broadcast.OutputPacket[4] = 60;
-//                broadcast.OutputPacket[5] = 25;
-//                //broadcast.OutputPacket[6] = 30;
-//                broadcast.OutputPacket[6] = 0;
-//                break;
+        if ((currentFrame.headMode != HorizontalTrack) &&
+                (currentFrame.headMode != VerticalTrack) &&
+                (currentFrame.headMode != BothTrack))
+        {
+            switch (currentFrame.headMode)
+            {
+            case FarLeft:
+                currentFrame.headAngleYaw = 90;
+                currentFrame.headAnglePitch = 25;
+                break;
 
-//            case FarMid:
-//                broadcast.OutputPacket[4] = 0;
-//                broadcast.OutputPacket[5] = 25;
-//                broadcast.OutputPacket[6] = 0;
-//                break;
+            case FarMid:
+                currentFrame.headAngleYaw = 0;
+                currentFrame.headAnglePitch = 25;
+                break;
 
-//            case FarRight:
-//                //broadcast.OutputPacket[4] = -30;
-//                broadcast.OutputPacket[4] = -60;
-//                broadcast.OutputPacket[5] = 25;
-//                //broadcast.OutputPacket[6] = -30;
-//                broadcast.OutputPacket[6] = 0;
-//                break;
+            case FarRight:
+                currentFrame.headAngleYaw = -90;
+                currentFrame.headAnglePitch = 25;
+                break;
 
-//            case CloseLeft:
-//                //broadcast.OutputPacket[4] = 30;
-//                broadcast.OutputPacket[4] = 60;
-//                broadcast.OutputPacket[5] = 65;
-//                //broadcast.OutputPacket[6] = 30;
-//                broadcast.OutputPacket[6] = 0;
-//                break;
+            case CloseLeft:
+                currentFrame.headAngleYaw = 90;
+                currentFrame.headAnglePitch = 65;
+                break;
 
-//            case CloseMid:
-//                broadcast.OutputPacket[4] = 0;
-//                broadcast.OutputPacket[5] = 65;
-//                broadcast.OutputPacket[6] = 0;
-//                break;
+            case CloseMid:
+                currentFrame.headAngleYaw = 0;
+                currentFrame.headAnglePitch = 65;
+                break;
 
-//            case CloseRight:
-//                //broadcast.OutputPacket[4] = -30;
-//                broadcast.OutputPacket[4] = -60;
-//                broadcast.OutputPacket[5] = 65;
-//                //broadcast.OutputPacket[6] = -30;
-//                broadcast.OutputPacket[6] = 0;
-//                break;
-//            }
-//        }
-//        else
-//        {
+            case CloseRight:
+                currentFrame.headAngleYaw = -90;
+                currentFrame.headAnglePitch = 65;
+                break;
+            }
+        }
+        else
+        {
 //            // Calculate expected ball bearing
 
 //            // x,y,theta 4,5,6
@@ -631,8 +660,8 @@ bool processHeadMode()
 //            cout << "ballBearing" << currentFrame.ballBearing << endl;
 //            cout << "expected_ball_bearing" << currentFrame.expected_ball_bearing << endl;
 
-//            if (currentFrame.headMode == BothTrack)
-//            {
+            if (currentFrame.headMode == BothTrack)
+            {
 //                if ( (fabs(currentFrame.ballBearing - currentFrame.expected_ball_bearing )*180/M_PI > 15) && currentFrame.isBallSeen == 1)  //if more than 10 degrees to the right, turn head right
 //                {
 //                    currentFrame.ball_moved_while_moving = true;
@@ -642,72 +671,66 @@ bool processHeadMode()
 //                    currentFrame.ball_moved_while_moving = false;
 //                }
 
-//                if (fabs(broadcast.OutputPacket[4] - currentFrame.ballBearing ) >90)
-//                {
-//                    if (broadcast.OutputPacket[4]>0)
-//                        broadcast.OutputPacket[4] = 90;
-//                    else
-//                        broadcast.OutputPacket[4] = -90;
-//                }
-//                else if (currentFrame.first_time_track_ball)
-//                {
-//                    broadcast.OutputPacket[4] -= currentFrame.ballBearing;
-//                    currentFrame.first_time_track_ball = false;
-//                }
+                if (fabs(currentFrame.headAngleYaw - currentFrame.ballBearing/M_PI*180 ) >130)
+                {
+                    if (currentFrame.headAngleYaw>0)
+                        currentFrame.headAngleYaw = 130;
+                    else
+                        currentFrame.headAngleYaw = -90;
+                }
+                else if (currentFrame.first_time_track_ball)
+                {
+                    currentFrame.headAngleYaw -= currentFrame.ballBearing;
+                    currentFrame.first_time_track_ball = false;
+                }
 //                else if (fabs(last_robot_orientation - broadcast.InputPacket[6])/M_PI*180 > 7)
 //                {
 //                    broadcast.OutputPacket[4] += (last_robot_orientation - broadcast.InputPacket[6])/M_PI*180;
 //                }
-//                else if ((currentFrame.ballBearing*180/M_PI) > 10 && currentFrame.isBallSeen == 1)  //if more than 10 degrees to the right, turn head right
-//                {
-//                    broadcast.OutputPacket[4] -= 3;
-//                    //                if(currentFrame.headAnglePitch < -40)
-//                    //                    broadcast.OutputPacket[4] -= 5;
-//                    //                else
-//                    //                    broadcast.OutputPacket[4] -= 10;
-//                }
-//                else if ((currentFrame.ballBearing*180/M_PI) < -10 && currentFrame.isBallSeen == 1)
-//                {
-//                    broadcast.OutputPacket[4] += 3;
-//                    //                if(currentFrame.headAnglePitch < -40)
-//                    //                    broadcast.OutputPacket[4] += 5;
-//                    //                else
-//                    //                    broadcast.OutputPacket[4] += 10;
-//                }
-//                else
-//                {
-//                    broadcast.OutputPacket[4] += 0;
-//                }
+                else if ((currentFrame.ballBearing*180/M_PI) > 10 && currentFrame.isBallSeen == 1)  //if more than 10 degrees to the right, turn head right
+                {
+                    currentFrame.headAngleYaw -= 3;
+                    //                if(currentFrame.headAnglePitch < -40)
+                    //                    broadcast.OutputPacket[4] -= 5;
+                    //                else
+                    //                    broadcast.OutputPacket[4] -= 10;
+                }
+                else if ((currentFrame.ballBearing*180/M_PI) < -10 && currentFrame.isBallSeen == 1)
+                {
+                    currentFrame.headAngleYaw += 3;
+                    //                if(currentFrame.headAnglePitch < -40)
+                    //                    broadcast.OutputPacket[4] += 5;
+                    //                else
+                    //                    broadcast.OutputPacket[4] += 10;
+                }
+                else
+                {
+                    currentFrame.headAngleYaw += 0;
+                }
 
 
-//                if (currentFrame.ballRange > 1.2 && currentFrame.isBallSeen == 1)  //if range more that 1 meter, head up
-//                {
+                if (currentFrame.ballRange > 1.2 && currentFrame.isBallSeen == 1)  //if range more that 1 meter, head up
+                {
 
-//                    broadcast.OutputPacket[5] = 25;
-//                }
-//                else if (currentFrame.ballRange <= 1.2 && currentFrame.ballRange >= 0 && currentFrame.isBallSeen == 1)
-//                {
+                    currentFrame.headAnglePitch = 25;
+                }
+                else if (currentFrame.ballRange <= 1.2 && currentFrame.ballRange >= 0 && currentFrame.isBallSeen == 1)
+                {
 
-//                    broadcast.OutputPacket[5] = 65;
-//                }
-//                else
-//                {
-//                    broadcast.OutputPacket[5] += 0;
-//                }
+                    currentFrame.headAnglePitch = 65;
+                }
+                else
+                {
+                    currentFrame.headAnglePitch += 0;
+                }
 
-//            }
-//        }
+            }
+        }
 
-//        currentFrame.headAnglePitch = broadcast.OutputPacket[5];
-//        currentFrame.headAngleYaw = broadcast.OutputPacket[4];
+       currentFrame.head_angle_yaw_list.push_back(currentFrame.headAngleYaw);
 
-//        currentFrame.head_angle_yaw_list.push_back(currentFrame.headAngleYaw);
 
-//    //    // Split the yaw angle between the head and the waist
-//    //    broadcast.OutputPacket[6] = broadcast.OutputPacket[4]/2;
-//    //    broadcast.OutputPacket[4] = broadcast.OutputPacket[4]/2;
-
-//        ROS_INFO("Pitch_request: %f, Yaw_request: %f, waist:%f robot orientation dif:%f",currentFrame.headAnglePitch, currentFrame.headAngleYaw,broadcast.OutputPacket[6],(last_robot_orientation - broadcast.InputPacket[6])/M_PI*180);
+        ROS_INFO("Pitch_request: %f, Yaw_request: %f",currentFrame.headAnglePitch, currentFrame.headAngleYaw);
 
 //        last_robot_orientation = broadcast.InputPacket[6];
 }

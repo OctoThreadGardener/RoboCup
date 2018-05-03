@@ -30,7 +30,7 @@
 #include <nav_msgs/Odometry.h>
 #include <decision/head_angle.h>     //msg
 
-
+#include <head_motion/head_pose.h>
 #include <decision/SerialReceived.h>
 #include <localization/OutputData.h>
 #include "math.h"

@@ -79,7 +79,7 @@ int main(int argc, char **argv)
     float waist_to_front_y = 0.0;
     float waist_to_front_theta = 0.0;
     float waist_height = 0.0;
-    float robot_moving = 0;
+    int robot_moving = 0;
     float switch_1 = 0;
     float switch_2 = 0;
     float switch_3 = 0;
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
         //                 (int)written_data_size,(int)(cmd[1]),(int)(cmd[2]),serial_output_data.received_data[0],serial_output_data.received_data[1],serial_output_data.received_data[2],serial_output_data.received_data[3],
         //                serial_output_data.received_data[4],serial_output_data.received_data[5],serial_output_data.received_data[6]);
 
-        // Read data from the serial port RS232
+        /// Read data from the serial port RS232
         int temp_data=0;
         int counter_to_head =0;
 
@@ -526,8 +526,8 @@ int main(int argc, char **argv)
 
         };
 
-        //        ROS_INFO("Read serial messsage: message_id:%d, odometry_x:%f, odometry_y:%f, odometry_theta:%f, gyro_roll:%f, gyro_pitch:%f, waist_to_front_foot:%f, waist_height:%f",
-        //                 input_msg_id,odometry_x,odometry_y,odometry_theta,gyro_roll,gyro_pitch,waist_to_front_foot,waist_height);
+        ROS_INFO("Read serial messsage: message_id:%d, odometry_x:%f, odometry_y:%f, odometry_theta:%f, gyro_roll:%f, gyro_pitch:%f, waist_to_front_x:%f, waist_to_front_y:%f, waist_to_front_theta:%f, waist_height:%f, robot_moving:%d",
+                         input_msg_id_1,odometry_x,odometry_y,odometry_theta,gyro_roll,gyro_pitch,waist_to_front_x,waist_to_front_y,waist_to_front_theta,waist_height,robot_moving);
 
         decision::SerialReceived serial_input_msg;
 

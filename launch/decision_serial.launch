@@ -1,0 +1,12 @@
+<launch>
+  <!-- First, launch "serial_receiver". Node listens to the serial communication between the NUC and the TX2.
+  Output is published over the topic "decision/serial_receiver"-->
+  <node name="serial_receiver" pkg="decision" type="serial_receiver" output="screen">
+  </node>
+
+  <!-- Then, launch "decision_node". Node implements the Xabsl-based behavior and sends commands
+  to the Motion NUC over the UDP communication channel. Output on screen.-->
+  <node name="decision_node" pkg="decision" type="decision_node" output="screen">
+  </node>
+
+</launch>

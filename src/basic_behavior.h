@@ -251,6 +251,22 @@ public:
     virtual void execute();
 };
 
+class behavior_stop_walk : public BasicBehavior
+{
+public:
+
+    behavior_stop_walk(xabsl::ErrorHandler &errorHandler)
+        : xabsl::BasicBehavior("behavior_stop_walk", errorHandler)
+    {	}
+
+    virtual void registerParameters()
+    {
+
+    }
+
+    virtual void execute();
+};
+
 class behavior_step_forward : public BasicBehavior
 {
 public:

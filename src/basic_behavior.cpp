@@ -17,14 +17,19 @@ decision_serial_output_data
 received_data[0]: Command Type
 
 0- Nothing
-1-Initialize motors
-2-Walk with speed mode
+1-Walk with speed mode
 3-Walk with target point mode
-6-Kick (Use with kick_leg, kick_strength, kick_angle)
+4-Kick left leg
+5-Kick right leg
+6-Kick (Use with ball_x, ball_y)
 
-FLOAT[1]: v_x for 2, target_x for 3, circle_radius for 6-7, kick_leg for 6
-FLOAT[2]: v_y for 2, target_y for 3, circle_theta for 6-7, kick_strength for 6
-FLOAT[3]: v_theta for 2, target_theta for 3, kick_angle for 6
+
+FLOAT[1]: v_x for 1, target_x for 3, ball_x for 6
+FLOAT[2]: v_y for 1, target_y for 3, ball_y for 6
+FLOAT[3]: v_theta for 1, target_theta for 3
+FLOAT[4]:
+FLOAT[5]:
+FLOAT[6]:
 
 
 */
@@ -168,7 +173,27 @@ void behavior_walk::execute()
     //cout << "[BEHAVIOR]:walk to a specific target range and bearing";
     printf("[BEHAVIOR]:walk to a specific target range and bearing");
 
-    currentFrame.decision_serial_output_data.received_data[0] = 0;
+    currentFrame.decision_serial_output_data.received_data[0] = 1;
+
+    currentFrame.decision_serial_output_data.received_data[1] = 0;
+    currentFrame.decision_serial_output_data.received_data[2] = 0;
+    currentFrame.decision_serial_output_data.received_data[3] = 0;
+
+    currentFrame.decision_serial_output_data.received_data[4] = 0;
+    currentFrame.decision_serial_output_data.received_data[5] = 0;
+    currentFrame.decision_serial_output_data.received_data[6] = 0;
+
+    //currentFrame.robot_moved = true;
+
+}
+
+void behavior_stop_walk::execute()
+{
+    //cout << "[BEHAVIOR]:walk to a specific target range and bearing";
+    printf("[BEHAVIOR]:walk to a specific target range and bearing");
+
+    currentFrame.decision_serial_output_data.received_data[0] = 1;
+
     currentFrame.decision_serial_output_data.received_data[1] = 0;
     currentFrame.decision_serial_output_data.received_data[2] = 0;
     currentFrame.decision_serial_output_data.received_data[3] = 0;
@@ -176,7 +201,7 @@ void behavior_walk::execute()
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
 
-    currentFrame.robot_moved = true;
+    //currentFrame.robot_moved = true;
 
 }
 
@@ -294,6 +319,11 @@ void behavior_kick_ball_strong::execute()
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
 
+    // Debug
+    currentFrame.decision_serial_output_data.received_data[1] = 0.2;
+    currentFrame.decision_serial_output_data.received_data[2] = -0.1;
+    currentFrame.decision_serial_output_data.received_data[3] = 0;
+
     ROS_INFO("[BEHAVIOR]:kick the ball with high strength at (%f,%f,%f)",currentFrame.decision_serial_output_data.received_data[1],
             currentFrame.decision_serial_output_data.received_data[2],currentFrame.decision_serial_output_data.received_data[3]);
 
@@ -303,15 +333,20 @@ void behavior_kick_ball_strong::execute()
 void behavior_approach_ball::execute()
 {
     //cout << "[BEHAVIOR]:kick the ball with medium strength ";
-    printf("[BEHAVIOR]:kick the ball with medium strength  ");
+    printf("[BEHAVIOR]:approach ball  ");
 
-    currentFrame.decision_serial_output_data.received_data[0] = 0;
-    currentFrame.decision_serial_output_data.received_data[1] = 0;
-    currentFrame.decision_serial_output_data.received_data[2] = 0;
+
+    currentFrame.decision_serial_output_data.received_data[0] = 3;
+    currentFrame.decision_serial_output_data.received_data[1] = currentFrame.ballRange * cos(currentFrame.ballBearing);
+    currentFrame.decision_serial_output_data.received_data[2] = currentFrame.ballRange * sin(currentFrame.ballBearing);
     currentFrame.decision_serial_output_data.received_data[3] = 0;
     currentFrame.decision_serial_output_data.received_data[4] = 0;
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
+
+    // Debug
+    currentFrame.decision_serial_output_data.received_data[1] = 0.8;
+    currentFrame.decision_serial_output_data.received_data[2] = 0.1;
 
     currentFrame.robot_moved = true;
 
@@ -360,13 +395,14 @@ void behavior_rotate_before_walk::execute()
     //cout << "[BEHAVIOR]:kick the ball with medium strength ";
     printf("[BEHAVIOR]:behavior_rotate_before_walk ");
 
-    currentFrame.decision_serial_output_data.received_data[0] = 3;
+    currentFrame.decision_serial_output_data.received_data[0] = 1;
     currentFrame.decision_serial_output_data.received_data[1] = 0;
     currentFrame.decision_serial_output_data.received_data[2] = 0;
-    currentFrame.decision_serial_output_data.received_data[3] = - 0.5 * currentFrame.ballBearing;
+    currentFrame.decision_serial_output_data.received_data[3] = - 1.0 * currentFrame.ballBearing;
     currentFrame.decision_serial_output_data.received_data[4] = 0;
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
+
 
     currentFrame.robot_moved = true;
 
@@ -377,10 +413,10 @@ void behavior_during_left_walk::execute()
     //cout << "[BEHAVIOR]:kick the ball with medium strength ";
     printf("[BEHAVIOR]:behavior_during_left_walk  ");
 
-    currentFrame.decision_serial_output_data.received_data[0] = 2;
+    currentFrame.decision_serial_output_data.received_data[0] = 1;
     currentFrame.decision_serial_output_data.received_data[1] = 0.2;  //v_x
     currentFrame.decision_serial_output_data.received_data[2] = 0;  //v_y
-    currentFrame.decision_serial_output_data.received_data[3] = - 0.5 * currentFrame.ballBearing;  //v_theta
+    currentFrame.decision_serial_output_data.received_data[3] = - 1.0 * currentFrame.ballBearing;  //v_theta
     currentFrame.decision_serial_output_data.received_data[4] = 0;
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
@@ -394,10 +430,10 @@ void behavior_during_right_walk::execute()
     //cout << "[BEHAVIOR]:kick the ball with medium strength ";
     printf("[BEHAVIOR]:behavior_during_right_walk  ");
 
-    currentFrame.decision_serial_output_data.received_data[0] = 2;
+    currentFrame.decision_serial_output_data.received_data[0] = 1;
     currentFrame.decision_serial_output_data.received_data[1] = 0.2;  //v_x
     currentFrame.decision_serial_output_data.received_data[2] = 0;  //v_y
-    currentFrame.decision_serial_output_data.received_data[3] = - 0.5 * currentFrame.ballBearing;  //v_theta
+    currentFrame.decision_serial_output_data.received_data[3] = - 1.0 * currentFrame.ballBearing;  //v_theta
     currentFrame.decision_serial_output_data.received_data[4] = 0;
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
@@ -418,6 +454,9 @@ void behavior_rotate_after_walk::execute()
     currentFrame.decision_serial_output_data.received_data[4] = 0;
     currentFrame.decision_serial_output_data.received_data[5] = 0;
     currentFrame.decision_serial_output_data.received_data[6] = 0;
+
+    currentFrame.decision_serial_output_data.received_data[1] = 0.8;
+    currentFrame.decision_serial_output_data.received_data[2] = 0.1;
 
     currentFrame.robot_moved = true;
 
