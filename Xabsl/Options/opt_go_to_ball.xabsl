@@ -1,12 +1,12 @@
 // opt_go_to_ball: Suppose the ball is already seen, go to the ball.
 
-// Input Flags: 
+// Input variables:
 //      - is_within_tol
 //      - is_left
 //      - is_near_enough
 //      - is_ready_to_kick      # not used
 //
-// Output Flags:
+// Output variables:
 //      - headMode
 
 option opt_go_to_ball

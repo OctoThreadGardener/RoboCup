@@ -72,6 +72,7 @@ option opt_attack_procedure
             }
         }
         action {
+            kick_speed = 2;
             opt_kick_ball();
         }
     }
@@ -81,9 +82,8 @@ option opt_attack_procedure
             stay;
         }
         action {
-            behavior_nothing(); 
+            behavior_nothing();
         }
     }
 
 }
-
