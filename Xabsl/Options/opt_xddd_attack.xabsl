@@ -1,11 +1,19 @@
 option opt_xddd_attack{
   initial state first_search {
     decision {
-      if (!action_done) {
-        stay;
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
       }
       else {
-        goto first_walk;
+        if (!action_done) {
+          stay;
+        }
+        else {
+          goto first_walk;
+        }
       }
     }
     action {
@@ -16,11 +24,19 @@ option opt_xddd_attack{
   
   state first_walk{
     decision{
-      if (!action_done) {
-        stay;
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
       }
       else {
-        goto first_kick;
+        if (!action_done) {
+          stay;
+        }
+        else {
+          goto first_kick;
+        }
       }
     }
     action{
@@ -31,11 +47,19 @@ option opt_xddd_attack{
 
   state first_kick{
     decision{
-      if (!action_done) {
-        stay;
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
       }
       else {
-        goto walk_with_fake_ball;
+        if (!action_done) {
+          stay;
+        }
+        else {
+          goto walk_with_fake_ball;
+        }
       }
     }
     action{
@@ -47,11 +71,19 @@ option opt_xddd_attack{
   state walk_with_fake_ball
   {
     decision {
-      if (!action_done) {
-        stay;
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
       }
       else {
-        goto later_walk;
+        if (!action_done) {
+          stay;
+        }
+        else {
+          goto later_walk;
+        }
       }
     }
     action {
@@ -61,11 +93,19 @@ option opt_xddd_attack{
 
   state later_walk{
     decision{
-      if (!action_done) {
-        stay;
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
       }
       else {
-        goto later_kick;
+        if (!action_done) {
+          stay;
+        }
+        else {
+          goto later_kick;
+        }
       }
     }
     action{
@@ -75,11 +115,19 @@ option opt_xddd_attack{
 
   state later_kick{
     decision{
-      if (!action_done) {
-        stay;
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
       }
       else {
-        goto walk_with_fake_ball;
+        if (!action_done) {
+          stay;
+        }
+        else {
+          goto walk_with_fake_ball;
+        }
       }
     }
     action {
@@ -88,39 +136,21 @@ option opt_xddd_attack{
      }
   }
 
-
-  state template{
-    decision{
-      if (!isAttacher) {
-        goto end;
-      }
-      else if (!isBallSeen){
-        goto xddd_search_ball;
-      }
-      else {
-        //go to whatever you want
-      }
-    }
-      action{
-        do_something();  
-    }
-  }
-  
   state xddd_search_ball{
     decision{
-    if (state_time > 10000){ // cannot search ball for such a long time, goto end
-      goto end;
-    }
-    else if (state_time < 1000){
-      stay;
-    }
-    else{
-      if (isBallSeen){
-        goto later_walk;
+      if (state_time > 10000){ // cannot search ball for such a long time, goto end
+        goto end;
       }
-    }
+      else if (state_time < 1000){
+        stay;
+      }
+      else{
+        if (isBallSeen){
+          goto later_walk;
+        }
+      }
 
-  }
+    }
     action{
       search_ball();
     }
