@@ -10,10 +10,10 @@ option opt_game_nearballadjust
                               stay;
                      }
                            
-                        else if (pause)
-                        {
+                     else if (pause)
+                      {
                                 goto idle_state;
-                        }
+                      }
                      else
                      {
                               goto wait_for_ready;
@@ -27,7 +27,7 @@ option opt_game_nearballadjust
 
   state wait_for_ready//2
   {
-    decision
+   decision
     {      
       if (isGameOver)
       {
@@ -137,7 +137,8 @@ option opt_game_nearballadjust
                         }
 			else if(isAttacker)
 			{
-				goto walk_with_ball;
+				//goto walk_with_ball;
+        goto walk_with_ball_2018;
 			}
       else
       {
@@ -152,6 +153,19 @@ option opt_game_nearballadjust
 		}
 	}
 
+state walk_with_ball_2018{
+decision{
+  if (!action_done){
+  stay;
+  }
+  else{
+  goto game_over;
+  }
+}
+action{
+opt_xddd_attack();
+}
+}
 
 
 	state walk_with_ball//3

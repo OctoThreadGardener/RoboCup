@@ -41,10 +41,14 @@ namespace xabsl_symbol("xabsl_symbols")
       FarLeft,
       FarMid,
       FarRight,
+      FarRightBack,
+      FarLeftBack,
 
       CloseLeft,
       CloseMid,    // straight
       CloseRight,
+      CloseRightBack,
+      CloseLeftBack,
 
       HorizontalTrack,
       VerticalTrack,
@@ -165,9 +169,10 @@ bool input cannot_kick;
                 float output turned;
 
 
-
                 float output target_range;
                 float output target_bearing;
+                float output target_x;
+                float output target_y;
                 float output target_theta;
                 float output robot_goal_bearing;
 
@@ -183,6 +188,7 @@ bool input cannot_kick;
                 
                 float internal goal_found_goal_bearing;
                 float internal goal_found_goal_range;
+                bool internal search_loop_complete;
 
 
     // Additions 2018
@@ -190,5 +196,6 @@ bool input cannot_kick;
     bool input is_left;
     bool input is_near_enough;
     bool input is_ready_to_kick;    // not used
+
 
 }

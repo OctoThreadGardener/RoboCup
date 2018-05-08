@@ -29,6 +29,22 @@ option opt_search_for_ball_kick_off
 			{
 				goto look_down_left;
 			}
+      else if (lastBallDir == CloseLeftBack)
+      {
+        goto look_down_left_back;
+      }
+      else if (lastBallDir == CloseRightBack)
+      {
+        goto look_down_right_back;
+      }
+      else if (lastBallDir == FarLeftBack)
+      {
+        goto look_up_left_back;
+      }
+      else if (lastBallDir == FarRightBack)
+      {
+        goto look_up_right_back;
+      }
 			else 
 			{
 				goto look_down_mid;
@@ -38,7 +54,6 @@ option opt_search_for_ball_kick_off
 		action
 		{
                         behavior_nothing();
-			turned = 0;
 		}
 	}
 
@@ -51,7 +66,7 @@ option opt_search_for_ball_kick_off
                         {
                                 goto ball_seen;
                         }
-                        else if (state_time < 5000)
+                        else if (state_time < 2000)
 			{
 				stay;
 			}
@@ -64,6 +79,7 @@ option opt_search_for_ball_kick_off
 		{
 			headMode = FarMid;
                         lastBallDir = FarMid;
+                        search_loop_complete = true;
                         behavior_initialize();
 		}
 	}
@@ -72,11 +88,15 @@ option opt_search_for_ball_kick_off
 	{
 		decision
 		{
-                        if (isBallSeen)
-                        {
-                                goto ball_seen;
-                        }
-			else if (state_time < 5000)
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+			else if (state_time < 2000)
 			{
 				stay;
 			}
@@ -98,17 +118,21 @@ option opt_search_for_ball_kick_off
 		decision
 		{
 		{
-                        if (isBallSeen)
-                        {
-                                goto ball_seen;
-                        }
-			else if (state_time < 5000)
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+			else if (state_time < 2000)
 			{
 				stay;
 			}
                         else 
                         {
-                                goto look_up_left;
+                                goto look_up_right_back;
 		        }
                 }
                 }
@@ -124,17 +148,21 @@ option opt_search_for_ball_kick_off
 	{
 		decision
 		{
-                        if (isBallSeen)
-                        {
-                                goto ball_seen;
-                        }
-			else if (state_time < 5000)
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+			else if (state_time < 2000)
 			{
 				stay;
 			}
                         else 
                         {
-                                goto look_down_left;
+                                goto look_up_mid;
 		        }
                 }
 		action
@@ -149,17 +177,21 @@ option opt_search_for_ball_kick_off
 	{
 		decision
 		{
-                        if (isBallSeen)
-                        {
-                                goto ball_seen;
-                        }
-			else if (state_time < 5000)
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+			else if (state_time < 2000)
 			{
 				stay;
 			}
                         else 
                         {
-                                goto look_down_right;
+                                goto look_down_left_back;
 		        }
                 }
 		action
@@ -174,17 +206,21 @@ option opt_search_for_ball_kick_off
 	{
 		decision
 		{
-                        if (isBallSeen)
-                        {
-                                goto ball_seen;
-                        }
-			else if (state_time < 5000)
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+			else if (state_time < 2000)
 			{
 				stay;
 			}
                         else 
                         {
-                                goto look_up_mid;
+                                goto look_down_left;
 		        }
                 }
 		action
@@ -195,8 +231,124 @@ option opt_search_for_ball_kick_off
 		}
 	}
 
+          state look_down_right_back//7
+  {
+    decision
+    {
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+      else if (state_time < 2000)
+      {
+        stay;
+      }
+                        else 
+                        {
+                                goto look_down_right;
+            }
+                }
+    action
+    {
+      headMode = CloseRightBack;
+                        lastBallDir = CloseRightBack;
+                        behavior_initialize();
+    }
+  }
 
-       state ball_seen//7
+          state look_down_left_back//8
+  {
+    decision
+    {
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+      else if (state_time < 2000)
+      {
+        stay;
+      }
+                        else 
+                        {
+                                goto look_up_left_back;
+            }
+                }
+    action
+    {
+      headMode = CloseLeftBack;
+                        lastBallDir = CloseLeftBack;
+                        behavior_initialize();
+    }
+  }
+
+          state look_up_right_back//9
+  {
+    decision
+    {
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+      else if (state_time < 2000)
+      {
+        stay;
+      }
+                        else 
+                        {
+                                goto look_down_right_back;
+            }
+                }
+    action
+    {
+      headMode = FarRightBack;
+                        lastBallDir = FarRightBack;
+                        behavior_initialize();
+    }
+  }
+
+          state look_up_left_back//10
+  {
+    decision
+    {
+      if (isBallSeen)
+      {
+              goto ball_seen;
+      }
+      else if (search_loop_complete)
+      {
+        goto turn_body;
+      }
+      else if (state_time < 2000)
+      {
+        stay;
+      }
+                        else 
+                        {
+                                goto look_up_left;
+            }
+                }
+    action
+    {
+      headMode = FarLeftBack;
+                        lastBallDir = FarLeftBack;
+                        behavior_initialize();
+    }
+  }
+
+
+       state ball_seen//11
        {
                 decision
                 {
@@ -217,8 +369,32 @@ option opt_search_for_ball_kick_off
                        behavior_nothing();
                 }
   }
+
+  state turn_body //12
+  {
+    decision
+    {
+    if (state_time < 2000) {
+                stay;
+            }
+            else {
+            if (is_robot_moving)
+            {stay;}
+            else {
+                goto look_down_mid;
+                }
+            }
+        }
+        action {
+            target_theta = 100;
+            headMode = FarMid;
+            search_loop_complete = false;
+            behavior_round_clockwise();
+        }
+   }
+      
   
-        target state ball_seen_over//7
+        target state ball_seen_over//13
        {
                 decision
                 {
@@ -226,7 +402,7 @@ option opt_search_for_ball_kick_off
                 }
                 action
                 {
-                       headMode = BothTrack;
+                       headMode = HorizontalTrack;
                        behavior_nothing();
                 }
 	}

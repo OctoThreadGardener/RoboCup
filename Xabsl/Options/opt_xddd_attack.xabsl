@@ -1,0 +1,137 @@
+option opt_xddd_attack{
+  initial state first_search {
+    decision {
+      if (!action_done) {
+        stay;
+      }
+      else {
+        goto first_walk;
+      }
+    }
+    action {
+      search_ball();
+    }
+  }
+  
+  
+  state first_walk{
+    decision{
+      if (!action_done) {
+        stay;
+      }
+      else {
+        goto first_kick;
+      }
+    }
+    action{
+      // TODO: pass the target coordinate to cpp
+      opt_go_to_ball();
+    }
+  }
+
+  state first_kick{
+    decision{
+      if (!action_done) {
+        stay;
+      }
+      else {
+        goto walk_with_fake_ball;
+      }
+    }
+    action{
+      kickSpeed = low;  // TODO: correct the syntax
+      opt_kick_ball();
+    }
+  }
+
+  state walk_with_fake_ball
+  {
+    decision {
+      if (!action_done) {
+        stay;
+      }
+      else {
+        goto later_walk;
+      }
+    }
+    action {
+      opt_go_to_fake_ball();    // TODO: implement this option
+    }
+  }
+
+  state later_walk{
+    decision{
+      if (!action_done) {
+        stay;
+      }
+      else {
+        goto later_kick;
+      }
+    }
+    action{
+      opt_go_to_ball();
+    }
+  }
+
+  state later_kick{
+    decision{
+      if (!action_done) {
+        stay;
+      }
+      else {
+        goto walk_with_fake_ball;
+      }
+    }
+    action {
+       kickSpeed = High;    // TODO: correct this syntax
+       opt_kick_ball();
+     }
+  }
+
+
+  state template{
+    decision{
+      if (!isAttacher) {
+        goto end;
+      }
+      else if (!isBallSeen){
+        goto xddd_search_ball;
+      }
+      else {
+        //go to whatever you want
+      }
+    }
+      action{
+        do_something();  
+    }
+  }
+  
+  state xddd_search_ball{
+    decision{
+    if (state_time > 10000){ // cannot search ball for such a long time, goto end
+      goto end;
+    }
+    else if (state_time < 1000){
+      stay;
+    }
+    else{
+      if (isBallSeen){
+        goto later_walk;
+      }
+    }
+
+  }
+    action{
+      search_ball();
+    }
+  } 
+  
+  target state end {
+    decision {
+      stay;
+    }
+    action {
+      behavior_nothing();
+    }
+  }
+}

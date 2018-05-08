@@ -1,12 +1,12 @@
 // opt_go_to_ball: Suppose the ball is already seen, go to the ball.
 
-// Input variables:
+// Input Flags: 
 //      - is_within_tol
 //      - is_left
 //      - is_near_enough
 //      - is_ready_to_kick      # not used
 //
-// Output variables:
+// Output Flags:
 //      - headMode
 
 option opt_go_to_ball
@@ -31,7 +31,8 @@ option opt_go_to_ball
             }
         }
         action {
-            headMode = BothTrack;
+            //headMode = FarMid;
+            headMode = HorizontalTrack;
             behavior_nothing();     // wait until the flags are ready
         }
     }
@@ -40,7 +41,7 @@ option opt_go_to_ball
         decision {
             if (is_within_tol) {
                 if (is_left) {
-                    godo during_left_walk;
+                    goto during_left_walk;
                 }
                 else {
                     goto during_right_walk;
@@ -51,7 +52,8 @@ option opt_go_to_ball
             }
         }
         action {
-            headMode = BothTrack;
+            //headMode = FarMid;
+            headMode = HorizontalTrack;
             behavior_rotate_before_walk();
         }
     }
@@ -102,7 +104,8 @@ option opt_go_to_ball
                 stay;
             }
             else {
-                goto approach_ball;
+                goto go_to_ball_done;
+                //goto wait_before_approach_ball;
             }
         }
         action {
@@ -111,17 +114,35 @@ option opt_go_to_ball
         }
     }
 
-    state approach_ball {
+    state wait_before_approach_ball {
         decision {
-            if (state_time > 2000 || !is_robot_moving) {
-                goto go_to_ball_done;
-            }
-            else {
+            if (state_time < 2000) {
                 stay;
+            } else {
+                goto approach_ball;
             }
         }
         action {
-            headMode = BothTrack;
+            //headMode = FarMid;
+            behavior_nothing();
+        }
+    }
+
+    state approach_ball {
+        decision {
+            if (state_time < 2000) {
+                stay;
+            }
+            else {
+            if (is_robot_moving)
+            {stay;}
+            else {
+                goto go_to_ball_done;
+                }
+            }
+        }
+        action {
+            //headMode = FarMid;
             behavior_approach_ball();
         }
     }

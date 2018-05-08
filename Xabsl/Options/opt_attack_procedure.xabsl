@@ -2,23 +2,7 @@
 
 option opt_attack_procedure
 {
-    initial state initialize_motors {
-        decision {
-            if (state_time < 1000) {
-                stay;
-            }
-            else {
-                // TODO: add more conditions about the controller
-                goto initialize_robot;
-            }
-        }
-        action {
-            headMode = CloseMid;
-            behavior_initialize_motors();
-        }
-    }
-
-    state initialize_robot {
+    initial state initialize_robot {
         decision {
             if (state_time < 2000) {
                 stay;
@@ -27,8 +11,7 @@ option opt_attack_procedure
             }
         }
         action {
-            headMode = CloseMid;
-            kick_speed = 0;
+            headMode = FarMid;
             behavior_initialize();
         }
     }
@@ -44,6 +27,7 @@ option opt_attack_procedure
         }
         action {
             // brute-force search
+            search_loop_complete = false;
             opt_search_for_ball_kick_off();     // TODO: switch to heuristic search
         }
     }
@@ -82,8 +66,9 @@ option opt_attack_procedure
             stay;
         }
         action {
-            behavior_nothing();
+            behavior_nothing(); 
         }
     }
 
 }
+

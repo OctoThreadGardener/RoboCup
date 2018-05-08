@@ -4,7 +4,7 @@
 
 
 // Callback functions for the received messages: goalpost, game controller, ball, opponent, head gyro, and localization
-void CBOnGoalReceived(const stereo_process::Goalpost::ConstPtr &msg)
+void CBOnGoalReceived(const vision::Goalpost::ConstPtr &msg)
 {
     currentFrame.received_goalpost = *msg;
 
@@ -14,22 +14,22 @@ void CBOnGoalReceived(const stereo_process::Goalpost::ConstPtr &msg)
         currentFrame.foundGoalTime = ros::Time::now().toSec();
 
 
-//    ROS_INFO("goalFoundHeadAngleYaw: error check ");
+        //    ROS_INFO("goalFoundHeadAngleYaw: error check ");
 
 
-//    ROS_INFO("goalFoundHeadAngleYaw:%f with delay:%f ",currentFrame.goalFoundHeadAngleYaw,
-//             currentFrame.head_angle_yaw_list.size() - trunc(ros::Time::now().toSec()-currentFrame.received_goalpost.header.stamp.toSec()));
+        //    ROS_INFO("goalFoundHeadAngleYaw:%f with delay:%f ",currentFrame.goalFoundHeadAngleYaw,
+        //             currentFrame.head_angle_yaw_list.size() - trunc(ros::Time::now().toSec()-currentFrame.received_goalpost.header.stamp.toSec()));
 
-    if (((currentFrame.head_angle_yaw_list.size() - trunc(ros::Time::now().toSec()-currentFrame.received_goalpost.header.stamp.toSec())) >10) )
+        if (((currentFrame.head_angle_yaw_list.size() - trunc(ros::Time::now().toSec()-currentFrame.received_goalpost.header.stamp.toSec())) >10) )
 
-    {
-        currentFrame.goalFoundHeadAngleYaw = currentFrame.head_angle_yaw_list.at(currentFrame.head_angle_yaw_list.size() -
-                                                                                 trunc(ros::Time::now().toSec()-currentFrame.received_goalpost.header.stamp.toSec())-1);
-    }
-    else
-    {
-        currentFrame.goalFoundHeadAngleYaw = 0;
-    }
+        {
+            currentFrame.goalFoundHeadAngleYaw = currentFrame.head_angle_yaw_list.at(currentFrame.head_angle_yaw_list.size() -
+                                                                                     trunc(ros::Time::now().toSec()-currentFrame.received_goalpost.header.stamp.toSec())-1);
+        }
+        else
+        {
+            currentFrame.goalFoundHeadAngleYaw = 0;
+        }
     }
 
 
@@ -45,7 +45,7 @@ void CBOnControllingReceived(const gamecontroller::gameControl::ConstPtr &msg)
     //             msg->state,msg->secondaryState,msg->secsRemaining);
 }
 
-void CBOnBallReceived(const stereo_process::Ball::ConstPtr &msg)
+void CBOnBallReceived(const vision::Ball::ConstPtr &msg)
 {
     currentFrame.received_ball = *msg;
 
@@ -53,7 +53,7 @@ void CBOnBallReceived(const stereo_process::Ball::ConstPtr &msg)
 
     currentFrame.foundBallTime = ros::Time::now().toSec();
 
-        //ROS_INFO("ballFoundHeadAngleYaw: error check ");
+    //ROS_INFO("ballFoundHeadAngleYaw: error check ");
 
     if ((currentFrame.head_angle_yaw_list.size() - trunc(ros::Time::now().toSec()-currentFrame.received_ball.header.stamp.toSec())) >10 )
     {
@@ -65,50 +65,52 @@ void CBOnBallReceived(const stereo_process::Ball::ConstPtr &msg)
         currentFrame.ballFoundHeadAngleYaw = 0;
     }
 
-//    ROS_INFO("ballFoundHeadAngleYaw:%f with delay:%f ",currentFrame.ballFoundHeadAngleYaw,
-//             ros::Time::now().toSec()-currentFrame.received_ball.header.stamp.toSec());
+    //    ROS_INFO("ballFoundHeadAngleYaw:%f with delay:%f ",currentFrame.ballFoundHeadAngleYaw,
+    //             ros::Time::now().toSec()-currentFrame.received_ball.header.stamp.toSec());
+    double ball_distance_x ;
+    double ball_distance_y ;
 
+
+
+    //currentFrame.cannot_kick = !(kick_check(currentFrame.received_ball.ball_center_x, currentFrame.received_ball.ball_center_y));
+    //if (currentFrame.cannot_kick)
+    //{
+    //    currentFrame.ball_image_x = currentFrame.received_ball.ball_center_x; // ball_x
+    //    currentFrame.ball_image_y = currentFrame.received_ball.ball_center_y; // ball_y
+    //}
+
+    //currentFrame.front_distance = kick_check_x(currentFrame.received_ball.ball_center_x, currentFrame.received_ball.ball_center_y);
+    //currentFrame.side_distance = kick_check_y(currentFrame.received_ball.ball_center_x, currentFrame.received_ball.ball_center_y);
 }
 
-void CBOnObstaclesReceived(const stereo_process::Obstacles::ConstPtr &msg)
+void CBOnOpponentsReceived(const vision::Opponents::ConstPtr &msg)
 {
-    currentFrame.received_obstacles = *msg;
+    currentFrame.received_opponents = *msg;
 }
 
-void CBOnHeadGyroReceived(const sensor_msgs::Imu::ConstPtr &msg)
-{
-    tf::Quaternion imu_q;
-
-    imu_q.setW(msg->orientation.w);
-    imu_q.setX(msg->orientation.x);
-    imu_q.setY(msg->orientation.y);
-    imu_q.setZ(msg->orientation.z);
-
-    //Change from imu data to head_gyro data. For now, imu roll is head pitch and imu pitch is head yaw
-    tf::Matrix3x3 imu_m(imu_q);
-    double imu_roll, imu_pitch, imu_yaw;
-    imu_m.getRPY(imu_roll, imu_pitch, imu_yaw);
-
-    currentFrame.received_headgyro.euler_angle.x = imu_yaw;
-    currentFrame.received_headgyro.euler_angle.y = imu_roll;
-    currentFrame.received_headgyro.euler_angle.z = imu_pitch;
-}
 
 void CBOnLocalizationReceived(const localization::OutputData::ConstPtr &msg)
 {
     currentFrame.received_localization = *msg;
+
+    currentFrame.last_received_loc_time = msg->header.stamp.toSec();
+
+    ROS_INFO("Received localization: x=%f, y=%f, theta=%f, conf=%f",
+             currentFrame.received_localization.robotPose.x,currentFrame.received_localization.robotPose.y,
+             currentFrame.received_localization.robotPose.theta/M_PI*180,currentFrame.received_localization.robotPoseConfidence);
+
 }
 
 
 
 // Function that refreshes all the data received by the callback functions
-void DataStructure::FlushData(double _body_gyro,double _odom_orientation, double _odom_x, double _odom_y)
+void DataStructure::FlushData()
 {
 
     //this->kickDestTheta = lastFrame.kickDestTheta;//keep the value, this value is changed in the service "angle"
     lastFrame = *this;
 
-    //Game
+    ///Game
     this->timeLeft = static_cast<double>(received_gamecontrol.secsRemaining);
 
     this->isReady = received_gamecontrol.state == 1;
@@ -116,6 +118,11 @@ void DataStructure::FlushData(double _body_gyro,double _odom_orientation, double
     this->isGameStart = received_gamecontrol.state == 3;
     this->isGameOver = received_gamecontrol.state == 4 || timeLeft > 600; /// need to change this because rules have changed!!!
     // Need to see how to add the secondary states
+    if (((this->isAttacker) && !(static_cast<bool>(received_gamecontrol.kickOffTeam == 45))) ||
+            (!(this->isAttacker) && (static_cast<bool>(received_gamecontrol.kickOffTeam == 45))) )
+        this->attacker_changed = true;
+    else
+        this->attacker_changed = false;
     this->isAttacker =  static_cast<bool>(received_gamecontrol.kickOffTeam == 45);
     // STATE2_NORMAL               0
     // STATE2_PENALTYSHOOT         1
@@ -131,24 +138,47 @@ void DataStructure::FlushData(double _body_gyro,double _odom_orientation, double
         this->pause = false;
     this->sec_state = received_gamecontrol.secondaryState;
     this->sec_state_info = received_gamecontrol.secondaryStateInfo;
+    this->isShooter = static_cast<bool>(received_gamecontrol.secondaryStateTeam == 45);
+    this->isPenalized = static_cast<bool>(!(received_gamecontrol.penalty == 0));
 
-    //Ball
+    ///Ball
     if (currentFrame.isBallSeen == true)
     {
-        if (ros::Time::now().toSec() - currentFrame.foundBallTime > 6) //
+        if (ros::Time::now().toSec() - currentFrame.foundBallTime > 3) //
         {
             this->isBallSeen = false;
         }
     }
 
-    this->ballBearing = static_cast<double>(received_ball.ball_bearing/M_PI*180);
-    if (this->headAnglePitch == 65)
-    this->ballRange = static_cast<double>(received_ball.ball_range-0.23);  //as agreed with 2D
-    else
-        this->ballRange = static_cast<double>(received_ball.ball_range);
-    cout << "ballBearing:" << this->ballBearing << endl << "ballRange:" << this->ballRange << endl;
+    //this->ballBearing = static_cast<double>(received_ball.ball_bearing);
+    this->ballBearingCamera = - static_cast<double>(received_ball.ball_bearing);
+    this->ballBearing = - static_cast<double>(received_ball.ball_bearing) + currentFrame.ballFoundHeadAngleYaw/180*M_PI ;
+    this->ballRange = static_cast<double>(received_ball.ball_range);  //as agreed with 2D
+
     this->ballLoc_world_x = static_cast<double>(received_localization.ballCenterOnField.x);
     this->ballLoc_world_y = static_cast<double>(received_localization.ballCenterOnField.y);
+    this->ball_image_x = static_cast<double>(received_ball.ball_center_x);
+    this->ball_image_y = static_cast<double>(received_ball.ball_center_y);
+
+    cout << "ball_image_x:" << this->ball_image_x << "ballBearingCamera:" << this->ballBearingCamera << " ballBearing:" << this->ballBearing << endl << " ballRange:" << this->ballRange << endl;
+    cout << "ballLoc_world_x:" << this->ballLoc_world_x << "ballLoc_world_y:" << this->ballLoc_world_y << endl;
+
+    if ((fabs(this->ballBearing) < 0.1) && (this->isBallSeen))
+        this->is_within_tol = true;         // true if the angle between the body and the direction toward the ball is small enough
+    else
+        this->is_within_tol = false;
+
+    if ((this->ballBearing < 0) && (this->isBallSeen))
+        this->is_left = true;               // true if the body is to the left of the direction toward the ball
+    else
+        this->is_left = false;
+
+    if ((this->ballRange < 1.2) && (this->isBallSeen))
+        this->is_near_enough = true;        // true if near enough to ball, and object tracking mode can be enabled
+    else
+        this->is_near_enough = false;
+
+    is_ready_to_kick = true;      // true when near enough to kick
 
 
 
@@ -164,7 +194,7 @@ void DataStructure::FlushData(double _body_gyro,double _odom_orientation, double
 
     if ((currentFrame.received_goalpost.goalpost_number == 2)||(currentFrame.received_goalpost.goalpost_number == 3))
     {
-        this->goalCenterBearing = (static_cast<double>(received_goalpost.goalpost_left_bearing/M_PI*180) + static_cast<double>(received_goalpost.goalpost_right_bearing/M_PI*180)) / 2;
+        this->goalCenterBearing = (static_cast<double>(received_goalpost.goalpost_left_bearing) + static_cast<double>(received_goalpost.goalpost_right_bearing)) / 2;
         this->goalCenterRange = (static_cast<double>(received_goalpost.goalpost_left_range) + static_cast<double>(received_goalpost.goalpost_right_range)) / 2;
     }
     this->goalLocLeft_world_x = 4.5;
@@ -172,42 +202,29 @@ void DataStructure::FlushData(double _body_gyro,double _odom_orientation, double
     this->goalLocRight_world_x = 4.5;
     this->goalLocRight_world_y = 1.3;
 
-    this->robot_goal_bearing_odom =90- atan2((4.5-_odom_x),(_odom_y-0))/M_PI*180 -_odom_orientation/M_PI*180;
-    double test1= - odom_orientation/M_PI*180 - atan((_odom_y-0)/(4.5-_odom_x))/M_PI*180 ;
+    //    this->robot_goal_bearing_odom =90- atan2((4.5-_odom_x),(_odom_y-0)) -_odom_orientation;
 
 
-    ROS_INFO("Odom x:%f,y:%f,orient:%f,robot_goal_bearing_odom:%f, test1:%f",_odom_x,_odom_y,_odom_orientation,this->robot_goal_bearing_odom,
-             test1);
+    //    ROS_INFO("Odom x:%f,y:%f,orient:%f,robot_goal_bearing_odom:%f, test1:%f",_odom_x,_odom_y,_odom_orientation,this->robot_goal_bearing_odom,
+    //             test1);
 
-    //Opponent
-    this->isOpponentSeen = static_cast<bool>(received_obstacles.opponent_detected);
-    this->opponentCenterBearing = static_cast<double>(received_obstacles.opponent_bearing/M_PI*180);
-    this->opponentRange = static_cast<double>(received_obstacles.opponent_range);
-    cout << "opponentBearing:" << this->opponentCenterBearing << endl << "ballRange:" << this->opponentRange << endl;
-    this->opponentCenter_world_x = static_cast<double>(received_localization.opponentCenterOnField.x);
-    this->opponentCenter_world_y = static_cast<double>(received_localization.opponentCenterOnField.y);
+    //Opponents
+    // For one opponent now
+    this->isOpponentSeen = static_cast<bool>(received_opponents.opponent_detected);
+    if (this->isOpponentSeen)
+    {
+        this->opponentCenterBearing = static_cast<double>(received_opponents.opponent_bearing[0]);
+        this->opponentRange = static_cast<double>(received_opponents.opponent_range[0]);
+        cout << "opponentBearing:" << this->opponentCenterBearing << endl << "opponentRange:" << this->opponentRange << endl;
+        this->opponentCenter_world_x = static_cast<double>(received_localization.opponentCenterOnField.x);
+        this->opponentCenter_world_y = static_cast<double>(received_localization.opponentCenterOnField.y);
+    }
 
     //Robot
     this->robotLoc_x = static_cast<double>(received_localization.robotPose.x);
     this->robotLoc_y = static_cast<double>(received_localization.robotPose.y);
-    this->robotLoc_theta = static_cast<double>(received_localization.robotPose.theta/M_PI*180);
+    this->robotLoc_theta = static_cast<double>(received_localization.robotPose.theta);
     this->locConfidence = static_cast<double>(received_localization.robotPoseConfidence);
-
-    this->gyroHead = dealWithHeadYawTheta(received_headgyro.euler_angle.z/M_PI*180);
-    this->gyroBody = dealWithBodyYawTheta(_body_gyro); // xabsl only with degrees
-    this->odom_orientation = _odom_orientation/M_PI*180; // xabsl only with degrees
-
-    double a = currentFrame.goalCenterRange;
-    double b = currentFrame.ballRange;
-    double c = currentFrame.robot_goal_bearing/180*M_PI;
-    double d = currentFrame.ballBearing/180*M_PI -currentFrame.headAngleYaw/180*M_PI;
-    this->adjust_theta = - (asin(a*sin(c-d)/sqrt(pow(a,2)+pow(b,2)-2*a*b*cos(c-d))) + d)/M_PI*180; // xabsl only with degrees
-
-    //    this->headAnglePitch = received5.angle_head_pitch; // rad
-    //    this->headAngleYaw = received5.angle_head_yaw;
-
-
-
 
 
     //#endif
@@ -262,7 +279,7 @@ void DataStructure::PrintReceivedData(void)
     }
     else
     {
-        console_strstream << "ballRange: " << ballRange << "ballBearing: " << ballBearing << endl;
+        console_strstream << "ballRange: " << ballRange << "ballBearing: "  << ballBearing << "ballBearingCamera: " << ballBearingCamera  << "within_tol: " << is_within_tol << endl;
     }
 
     console_strstream << "isGoalSeen: " << (isGoalSeen ? "true" : "false") << endl;
@@ -291,39 +308,20 @@ void DataStructure::PrintReceivedData(void)
 
 
     console_strstream << "target_range: " << target_range << " target_bearing: " << target_bearing << " target_theta: " << target_theta << endl;
-    console_strstream << "gyroBody: " << gyroBody << " odom_orientation: " << odom_orientation << " adjust_theta: " << adjust_theta << endl;
+    console_strstream << "gyroBody: " << gyroBody << " odom_orientation: " << odom_orientation << endl;
 
     console_strstream << "ballFoundHeadAngleYaw: " << ballFoundHeadAngleYaw << " goalFoundHeadAngleYaw: " << goalFoundHeadAngleYaw << endl;
     console_strstream << "cannot_kick: " << cannot_kick << endl;
 
-}
+    console_strstream << "robotLoc_x: " << currentFrame.robotLoc_x << " robotLoc_y: " << currentFrame.robotLoc_y << " robotLoc_theta: "
+                      << (currentFrame.robotLoc_theta/M_PI*180) << " locConfidence: " << currentFrame.locConfidence << endl;
+    console_strstream << "odom_x: " << currentFrame.odom_x << " odom_y: " << currentFrame.odom_y << " odom_orientation: "
+                      << (currentFrame.odom_orientation/M_PI*180) << endl;
+    console_strstream << " state_code: " << currentFrame.state_code << " robot_moving: " << currentFrame.is_robot_moving << endl;
 
 
-//Function that corrects the head gyro angle and just calculates the difference from the initial yaw angle
-double dealWithHeadYawTheta(double inputYawTheta)
-{
-    if (isInitializing)
-    {
-        return inputYawTheta;
-    }
-    else
-    {
-        double result;
-        result = inputYawTheta - currentFrame.gyroInitHeadYawTheta;
-        if (result > 180.0)
-        {
-            result -= 360.0;
-        }
-        else
-        {
-            if (result <= -180.0)
-            {
-                result += 360.0;
-            }
-        }
-        return result;
-    }
 }
+
 
 //Function that corrects the body gyro angle and just calculates the difference from the initial yaw angle
 double dealWithBodyYawTheta(double inputYawTheta)
@@ -354,5 +352,233 @@ double dealWithBodyYawTheta(double inputYawTheta)
 DataStructure currentFrame;
 DataStructure lastFrame;
 double gyroInitYawTheta;
+
+bool kick_check(double camera_x , double camera_y){
+    double r_kick_x = (-0.2142 * camera_y + 112.016)/100.0;
+    double r_kick_y = (-0.216 * camera_x + 65.793)/100.0;
+    bool cankick = true;
+    double x_distance, y_distance;
+
+    //To save time, if can not kick, y_distance is the distance of r_kick_y to
+    //the nearest y we can kick.
+    if(r_kick_y > -0.05 && r_kick_y <= 0) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y >= -0.2 && r_kick_y <= -0.05) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y < -0.2) {
+        y_distance = -0.2 - r_kick_y;
+        cankick  = false;
+    }
+    else if(r_kick_y > 0 && r_kick_y < 0.05) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y >= 0.05 && r_kick_y <= 0.2) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y > 0.2) {
+        y_distance = 0.2 - r_kick_y;
+        cankick = false;
+    }
+
+    //x_distance should be >0 ,unless an error occured in vision
+    if(r_kick_x < 0){
+        x_distance = r_kick_x - 0.23;
+        cankick = false;
+    }
+
+    //To kick far, if can not kick, x_distance is the distance of r_kick_x to 0.33
+    if(r_kick_x < 0.23 && r_kick_x >= 0) {
+        x_distance = 0.0;
+    }
+    else if(r_kick_x >= 0.23 && r_kick_x <= 0.38) {
+        x_distance = 0.0;
+    }
+    else if(r_kick_x > 0.38 && r_kick_x <= 0.43) {
+        if(abs(r_kick_y) <= 0.09) {
+            x_distance = 0.0;
+        }
+        else if(abs(r_kick_y) > 0.09 && abs(r_kick_y) <= 0.2) {
+            if(r_kick_x > (-0.455 * abs(r_kick_y) + 0.471)) {
+                x_distance = r_kick_x - (-0.455 * abs(r_kick_y) + 0.471);
+                cankick = false;
+            }
+            x_distance = 0.0;
+        }
+        else if (abs(r_kick_y) > 0.2){
+            x_distance = r_kick_x - 0.38;
+            cankick = false;
+        }
+    }
+    else if(r_kick_x > 0.43) {
+        if(abs(r_kick_y) <= 0.09){
+            x_distance = r_kick_x - 0.43;
+            cankick = false;
+        }
+        else if(abs(r_kick_y) > 0.09 && abs(r_kick_y) <= 0.2){
+            x_distance = r_kick_x - (-0.455 * abs(r_kick_y) + 0.471);
+            cankick = false;
+        }
+        else if(abs(r_kick_y) > 0.2){
+            x_distance = r_kick_x - 0.38;
+            cankick = false;
+        }
+    }
+
+    return cankick;
+}
+
+double kick_check_x(double camera_x , double camera_y){
+    double r_kick_x = (-0.2142 * camera_y + 112.016)/100.0;
+    double r_kick_y = (-0.216 * camera_x + 65.793)/100.0;
+    bool cankick = true;
+    double x_distance, y_distance;
+
+    //To save time, if can not kick, y_distance is the distance of r_kick_y to
+    //the nearest y we can kick.
+    if(r_kick_y > -0.05 && r_kick_y <= 0) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y >= -0.2 && r_kick_y <= -0.05) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y < -0.2) {
+        y_distance = -0.2 - r_kick_y;
+        cankick  = false;
+    }
+    else if(r_kick_y > 0 && r_kick_y < 0.05) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y >= 0.05 && r_kick_y <= 0.2) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y > 0.2) {
+        y_distance = 0.2 - r_kick_y;
+        cankick = false;
+    }
+
+    //x_distance should be >0 ,unless an error occured in vision
+    if(r_kick_x < 0){
+        x_distance = r_kick_x - 0.23;
+        cankick = false;
+    }
+
+    //To kick far, if can not kick, x_distance is the distance of r_kick_x to 0.33
+    if(r_kick_x < 0.23 && r_kick_x >= 0) {
+        x_distance = 0.0;
+    }
+    else if(r_kick_x >= 0.23 && r_kick_x <= 0.38) {
+        x_distance = 0.0;
+    }
+    else if(r_kick_x > 0.38 && r_kick_x <= 0.43) {
+        if(abs(r_kick_y) <= 0.09) {
+            x_distance = 0.0;
+        }
+        else if(abs(r_kick_y) > 0.09 && abs(r_kick_y) <= 0.2) {
+            if(r_kick_x > (-0.455 * abs(r_kick_y) + 0.471)) {
+                x_distance = r_kick_x - (-0.455 * abs(r_kick_y) + 0.471);
+                cankick = false;
+            }
+            x_distance = 0.0;
+        }
+        else if (abs(r_kick_y) > 0.2){
+            x_distance = r_kick_x - 0.38;
+            cankick = false;
+        }
+    }
+    else if(r_kick_x > 0.43) {
+        if(abs(r_kick_y) <= 0.09){
+            x_distance = r_kick_x - 0.43;
+            cankick = false;
+        }
+        else if(abs(r_kick_y) > 0.09 && abs(r_kick_y) <= 0.2){
+            x_distance = r_kick_x - (-0.455 * abs(r_kick_y) + 0.471);
+            cankick = false;
+        }
+        else if(abs(r_kick_y) > 0.2){
+            x_distance = r_kick_x - 0.38;
+            cankick = false;
+        }
+    }
+
+    return x_distance;
+}
+
+double kick_check_y(double camera_x , double camera_y){
+    double r_kick_x = (-0.2142 * camera_y + 112.016)/100.0;
+    double r_kick_y = (-0.216 * camera_x + 65.793)/100.0;
+    bool cankick = true;
+    double x_distance, y_distance;
+
+    //To save time, if can not kick, y_distance is the distance of r_kick_y to
+    //the nearest y we can kick.
+    if(r_kick_y > -0.05 && r_kick_y <= 0) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y >= -0.2 && r_kick_y <= -0.05) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y < -0.2) {
+        y_distance = -0.2 - r_kick_y;
+        cankick  = false;
+    }
+    else if(r_kick_y > 0 && r_kick_y < 0.05) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y >= 0.05 && r_kick_y <= 0.2) {
+        y_distance = 0.0;
+    }
+    else if(r_kick_y > 0.2) {
+        y_distance = 0.2 - r_kick_y;
+        cankick = false;
+    }
+
+    //x_distance should be >0 ,unless an error occured in vision
+    if(r_kick_x < 0){
+        x_distance = r_kick_x - 0.23;
+        cankick = false;
+    }
+
+    //To kick far, if can not kick, x_distance is the distance of r_kick_x to 0.33
+    if(r_kick_x < 0.23 && r_kick_x >= 0) {
+        x_distance = 0.0;
+    }
+    else if(r_kick_x >= 0.23 && r_kick_x <= 0.38) {
+        x_distance = 0.0;
+    }
+    else if(r_kick_x > 0.38 && r_kick_x <= 0.43) {
+        if(abs(r_kick_y) <= 0.09) {
+            x_distance = 0.0;
+        }
+        else if(abs(r_kick_y) > 0.09 && abs(r_kick_y) <= 0.2) {
+            if(r_kick_x > (-0.455 * abs(r_kick_y) + 0.471)) {
+                x_distance = r_kick_x - (-0.455 * abs(r_kick_y) + 0.471);
+                cankick = false;
+            }
+            x_distance = 0.0;
+        }
+        else if (abs(r_kick_y) > 0.2){
+            x_distance = r_kick_x - 0.38;
+            cankick = false;
+        }
+    }
+    else if(r_kick_x > 0.43) {
+        if(abs(r_kick_y) <= 0.09){
+            x_distance = r_kick_x - 0.43;
+            cankick = false;
+        }
+        else if(abs(r_kick_y) > 0.09 && abs(r_kick_y) <= 0.2){
+            x_distance = r_kick_x - (-0.455 * abs(r_kick_y) + 0.471);
+            cankick = false;
+        }
+        else if(abs(r_kick_y) > 0.2){
+            x_distance = r_kick_x - 0.38;
+            cankick = false;
+        }
+    }
+
+    return y_distance;
+}
 
 
