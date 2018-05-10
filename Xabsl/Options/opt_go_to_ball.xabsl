@@ -17,7 +17,11 @@ option opt_go_to_ball
                 stay;
             }
             else {
-                if (is_within_tol) {
+                if (is_near_enough) {
+                    // when the ball is already near (e.g. kickoff), use position mode to approach the ball directly
+                    goto approach_ball;
+                }
+                else if (is_within_tol) {
                     if (is_left) {
                         goto during_left_walk;
                     }
