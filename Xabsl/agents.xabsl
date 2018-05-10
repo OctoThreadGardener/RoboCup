@@ -14,5 +14,5 @@ include "Options/opt_near_ball_adjust_test_2.xabsl";
 // Additions 2018
 include "Options/opt_attack_procedure.xabsl";
 include "Options/opt_go_to_ball.xabsl";
-include "Options/opt_xddd_attack";
-agent Decision("Xabsl", opt_attack_procedure);
+include "Options/opt_xddd_attack.xabsl";
+agent Decision("Xabsl", opt_xddd_attack);
