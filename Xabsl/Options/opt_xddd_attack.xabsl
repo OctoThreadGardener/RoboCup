@@ -63,7 +63,7 @@ option opt_xddd_attack{
       }
     }
     action{
-      kickSpeed = low;  // TODO: correct the syntax
+      kick_speed = 1;        // kick softly
       opt_kick_ball();
     }
   }
@@ -131,7 +131,7 @@ option opt_xddd_attack{
       }
     }
     action {
-       kickSpeed = High;    // TODO: correct this syntax
+       kick_speed = 2;        // kick strongly
        opt_kick_ball();
      }
   }
