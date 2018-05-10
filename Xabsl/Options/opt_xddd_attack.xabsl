@@ -87,7 +87,7 @@ option opt_xddd_attack{
       }
     }
     action {
-      opt_go_to_fake_ball();    // TODO: implement this option, head = mid far
+      opt_go_to_fake_ball();
     }
   }
 
